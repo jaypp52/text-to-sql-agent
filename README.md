@@ -22,7 +22,7 @@ result sets.
 | Read-only guardrails against unsafe SQL | `agent/db.py` + `agent/sql_guard.py`: read-only file, external access off and config locked, a sqlglot allow-list, LIMIT and timeout; 54 attacks in `eval/attacks.py` |
 
 > **Status (2026-11-24).** Everything below runs offline and is tested:
-> - 143 pytest tests (140 in CI, which skips the 3 that need the platform warehouse), including the attack list;
+> - 143 pytest tests (139 in CI, which skips the 4 that need the platform warehouse), including the attack list;
 > - the loop with Claude mocked, both in-process and as the real SDK against a fake HTTP endpoint;
 > - a mock-client eval on the seed and on the platform warehouse.
 >
@@ -301,6 +301,6 @@ otherwise. Those runs go to `eval/results/mock_*.json` and never to this README.
 2. Run `make verify-questions` to review the 50 gold queries by hand. Then rerun
    `make eval`, so the report says "50 verified by Jay".
 3. Annotate `eval/failure_notes.json` after reading the traces.
-4. Push to GitHub so CI runs: lint, 140 tests and the mock eval on the seed.
+4. Push to GitHub so CI runs: lint, 139 tests and the mock eval on the seed.
 
 See `docs/INTERVIEW_NOTES.md` for the questions in the plan's interview section.
