@@ -26,9 +26,11 @@ result sets.
 > - the loop with Claude mocked, both in-process and as the real SDK against a fake HTTP endpoint;
 > - a mock-client eval on the seed and on the platform warehouse.
 >
-> **No Anthropic API key was available while this was built.** So the model has not yet
-> answered a question: the results block below is empty, and `docs/sample_runs.md` has not
-> been generated. The 50 gold queries were run and checked against the warehouse
+> **No Anthropic API key was available while this was built.** So the API agent loop has
+> not yet run against the real model: the `make eval` results block below is empty, and
+> `docs/sample_runs.md` has not been generated. The labelled set *has* been answered by
+> Claude Haiku, Sonnet and Opus through Claude Code, using this agent's own tools; see
+> [Claude Code baseline](#claude-code-baseline-haiku-sonnet-opus) for those measured results. The 50 gold queries were run and checked against the warehouse
 > (`eval/gold_results.json`), but they are marked `verified_by: "pending"` until Jay
 > reviews them with `make verify-questions`. Next steps are
 > [at the end](#what-is-left-to-do).
