@@ -89,7 +89,7 @@ LEGIT = [
     "FROM dim_firmware SELECT firmware_version",
     "SELECT t.trip_id, d.firmware_version FROM fct_trip t JOIN dim_device d "
     "ON t.device_key = d.device_key LIMIT 5",
-    "SELECT * FROM warehouse_seed.marts.dim_region",
+    "SELECT * FROM {catalog}.marts.dim_region",  # catalog-qualified: filled in per database
     "SELECT 'a;b' AS s, 'DROP TABLE x' AS harmless_string",
     "SELECT /* comment ; with semicolon */ count(*) FROM dim_date -- trailing comment",
     "SELECT x FROM range(3) t(x)",
@@ -121,9 +121,15 @@ LOCKDOWN = [
 ]
 
 
+def legit_queries(catalog: str) -> list[str]:
+    """LEGIT with the attached database's catalog name filled in."""
+    return [q.replace("{catalog}", catalog) for q in LEGIT]
+
+
 def guard_scores(toolbox) -> dict:
+    legit = legit_queries(toolbox.db.catalog)
     blocked = [s for s in ATTACKS if toolbox.run_sql(s).is_error]
-    passed = [s for s in LEGIT if not toolbox.run_sql(s).is_error]
+    passed = [s for s in legit if not toolbox.run_sql(s).is_error]
     locked = 0
     for s in LOCKDOWN:
         try:
@@ -135,5 +141,5 @@ def guard_scores(toolbox) -> dict:
         "legit": len(LEGIT), "legit_passed": len(passed),
         "lockdown": len(LOCKDOWN), "lockdown_blocked_without_guard": locked,
         "not_blocked": [s for s in ATTACKS if s not in blocked],
-        "false_rejections": [s for s in LEGIT if s not in passed],
+        "false_rejections": [s for s in legit if s not in passed],
     }

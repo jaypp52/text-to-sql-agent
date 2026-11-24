@@ -37,7 +37,7 @@ def test_attack_list_is_big_enough(toolbox):
 
 @pytest.mark.parametrize("sql", LEGIT)
 def test_legit_query_allowed(toolbox, sql):
-    out = toolbox.run_sql(sql)
+    out = toolbox.run_sql(sql.replace("{catalog}", toolbox.db.catalog))
     assert not out.is_error, out.content
     assert out.data["row_count"] >= 1
 

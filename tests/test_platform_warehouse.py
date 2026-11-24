@@ -39,6 +39,14 @@ def test_index_and_search(platform):
     assert idx.describe("dim_device")["row_count"] >= 500
 
 
+def test_attack_list_on_platform(platform):
+    from eval.attacks import guard_scores
+
+    _, _, tb = platform
+    s = guard_scores(tb)
+    assert s["attacks_blocked"] == s["attacks"] and s["false_rejections"] == []
+
+
 def test_every_gold_sql_runs_on_platform(platform, questions):
     _, _, tb = platform
     for q in questions:
