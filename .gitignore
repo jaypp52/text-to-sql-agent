@@ -1,0 +1,12 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+seed/warehouse_seed.duckdb
+seed/warehouse_seed.duckdb.wal
+eval/results/runs/
+eval/results/mock_*.json
+eval/results/mock_*.md

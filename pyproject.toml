@@ -1,0 +1,47 @@
+[project]
+name = "text-to-sql-agent"
+version = "0.1.0"
+description = "Claude tool-use agent that answers natural-language questions over the telemetry platform's dbt marts in DuckDB, with layered read-only guardrails and an execution-accuracy eval"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Jay Koradiya" }]
+dependencies = [
+    "anthropic==2.13.0",
+    "duckdb==1.4.4",
+    "sqlglot==30.34.0",
+    "rank-bm25==0.2.2",
+    "numpy==2.5.5",
+    "fastapi==0.165.0",
+    "uvicorn==0.54.0",
+    "pydantic==2.14.4",
+    "python-dotenv==1.2.4",
+]
+
+[project.optional-dependencies]
+dev = ["pytest==9.2.0", "ruff==0.17.6", "httpx==0.28.1"]
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["agent*", "eval*", "seed*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = [".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "S"]
+# S101: asserts in tests; S608: SQL is built from our own identifiers; E501: long SQL
+# strings; S311: the seed generator needs a seeded PRNG, not a CSPRNG
+ignore = ["S101", "S608", "E501", "S311"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Body"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+markers = ["warehouse: needs the telemetry platform's real warehouse.duckdb (skipped otherwise)"]

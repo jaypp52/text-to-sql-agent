@@ -1,0 +1,40 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - name: Install
+        run: pip install -r requirements-dev.txt
+      - name: Lint
+        run: ruff check .
+      - name: Build the seed warehouse
+        run: python -m seed.make_seed_db
+      - name: Tests (guard attack list, loop with mocked Claude, SDK wire format, compare, index)
+        run: python -m pytest -v
+      - name: Eval on the seed with the mocked Claude client
+        run: |
+          python -m eval.run --client mock --seed --configs main,no_retrieval
+          python - <<'PY'
+          import json
+          r = json.load(open("eval/results/mock_seed.json"))
+          m = r["configs"]["main"]
+          assert m["execution_accuracy_pct"] == 100.0, m
+          assert m["guard_rejections"] == 0, m
+          print("pipeline check ok:", m["execution_accuracy_pct"], "% /", r["questions"]["total"], "questions")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mock-eval
+          path: eval/results/mock_seed.*

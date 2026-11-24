@@ -1,0 +1,3523 @@
+{
+ "metadata": {
+  "dbt_version": "1.11.15",
+  "generated_at": "2026-11-23T16:30:00.459839Z",
+  "project_name": "telemetry"
+ },
+ "nodes": {
+  "model.telemetry.dim_date": {
+   "columns": {
+    "date_day": {
+     "description": "Primary key: the calendar day.",
+     "name": "date_day"
+    },
+    "is_weekend": {
+     "description": "Saturday or Sunday.",
+     "name": "is_weekend"
+    }
+   },
+   "description": "Calendar dimension (UTC days), generated with dbt_utils.date_spine.",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "dim_date"
+   ],
+   "name": "dim_date",
+   "primary_key": [
+    "date_day"
+   ],
+   "refs": [],
+   "resource_type": "model",
+   "schema": "marts",
+   "unique_id": "model.telemetry.dim_date"
+  },
+  "model.telemetry.dim_device": {
+   "columns": {
+    "device_id": {
+     "description": "Natural device id, e.g. dev-000001. Not unique here: one row per firmware window.",
+     "name": "device_id"
+    },
+    "device_key": {
+     "description": "Surrogate primary key of a device version (one per validity window).",
+     "name": "device_key"
+    },
+    "firmware_version": {
+     "description": "Firmware version running during this window.",
+     "name": "firmware_version"
+    },
+    "hardware_model": {
+     "description": "Hardware model: TX-100, TX-200 or TX-300.",
+     "name": "hardware_model"
+    },
+    "install_date": {
+     "description": "Date the device was installed in the vehicle.",
+     "name": "install_date"
+    },
+    "is_current": {
+     "description": "True for the device's latest known firmware window.",
+     "name": "is_current"
+    },
+    "region_id": {
+     "description": "Operating region of the device.",
+     "name": "region_id"
+    },
+    "valid_from": {
+     "description": "Start of the window (inclusive): first event on this firmware; install date for the first version.",
+     "name": "valid_from"
+    },
+    "valid_to": {
+     "description": "End of the window (exclusive); 9999-12-31 for the current row.",
+     "name": "valid_to"
+    }
+   },
+   "description": "SCD Type 2 device dimension, built from the dim_device_snapshot snapshot. One row per device per firmware validity window [valid_from, valid_to). Join facts \"as of\" event time with `event_ts >= valid_from and event_ts < valid_to`; use `is_current` for the device's present state.\n",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "dim_device"
+   ],
+   "name": "dim_device",
+   "primary_key": [
+    "device_key"
+   ],
+   "refs": [
+    {
+     "name": "dim_device_snapshot",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "model",
+   "schema": "marts",
+   "unique_id": "model.telemetry.dim_device"
+  },
+  "model.telemetry.dim_firmware": {
+   "columns": {
+    "firmware_version": {
+     "description": "Primary key, semantic version string such as 1.1.0.",
+     "name": "firmware_version"
+    },
+    "is_latest": {
+     "description": "True for the most recently released version.",
+     "name": "is_latest"
+    },
+    "release_date": {
+     "description": "Date the version was released to the fleet (start of its rollout).",
+     "name": "release_date"
+    }
+   },
+   "description": "Firmware dimension. One row per firmware version.",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "dim_firmware"
+   ],
+   "name": "dim_firmware",
+   "primary_key": [
+    "firmware_version"
+   ],
+   "refs": [
+    {
+     "name": "stg_firmware_releases",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "model",
+   "schema": "marts",
+   "unique_id": "model.telemetry.dim_firmware"
+  },
+  "model.telemetry.fct_device_daily": {
+   "columns": {
+    "avg_temp_c": {
+     "description": "Average board temperature over the day's drive minutes.",
+     "name": "avg_temp_c"
+    },
+    "crash_count": {
+     "description": "CAM_CRASH events that day.",
+     "name": "crash_count"
+    },
+    "device_id": {
+     "description": "Natural device id.",
+     "name": "device_id"
+    },
+    "device_key": {
+     "description": "FK to dim_device: the device version live at the end of the device's day.",
+     "name": "device_key"
+    },
+    "drive_minutes": {
+     "description": "Minutes with ignition on (rows in fct_device_minute).",
+     "name": "drive_minutes"
+    },
+    "event_date": {
+     "description": "UTC day.",
+     "name": "event_date"
+    },
+    "firmware_changed": {
+     "description": "The device ran more than one firmware version that day (it upgraded).",
+     "name": "firmware_changed"
+    },
+    "firmware_version": {
+     "description": "Firmware on that day (the last version the device ran that day).",
+     "name": "firmware_version"
+    },
+    "gps_valid_pct": {
+     "description": "Minutes with `fix_valid = true` / drive minutes * 100. Null when the device did not drive.",
+     "name": "gps_valid_pct"
+    },
+    "lte_loss_pct": {
+     "description": "Minutes with `registered = false OR ip_assigned = false` / drive minutes * 100. Null when the device did not drive that day.\n",
+     "name": "lte_loss_pct"
+    },
+    "max_temp_c": {
+     "description": "Maximum board temperature over the day's drive minutes.",
+     "name": "max_temp_c"
+    }
+   },
+   "description": "Aggregate fact at device x day grain (UTC days). A device-day exists when the device had at least one drive minute or one device event that day.\n",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "fct_device_daily"
+   ],
+   "name": "fct_device_daily",
+   "primary_key": [
+    "device_id",
+    "event_date"
+   ],
+   "refs": [
+    {
+     "name": "fct_device_minute",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "fct_device_event",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "fct_trip",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "stg_fleet_registry",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "model",
+   "schema": "marts",
+   "unique_id": "model.telemetry.fct_device_daily"
+  },
+  "model.telemetry.fct_device_event": {
+   "columns": {
+    "device_key": {
+     "description": "FK to dim_device, as of event_ts.",
+     "name": "device_key"
+    },
+    "event_code": {
+     "description": "FK to dim_event_code.",
+     "name": "event_code"
+    },
+    "event_date": {
+     "description": "UTC date of event_ts.",
+     "name": "event_date"
+    },
+    "event_id": {
+     "description": "Primary key.",
+     "name": "event_id"
+    },
+    "firmware_version": {
+     "description": "Firmware that produced the event.",
+     "name": "firmware_version"
+    },
+    "severity": {
+     "description": "Severity reported with the event.",
+     "name": "severity"
+    }
+   },
+   "description": "Fact with one row per device event (crash, reboot, alarm, firmware update).",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "fct_device_event"
+   ],
+   "name": "fct_device_event",
+   "primary_key": [
+    "event_id"
+   ],
+   "refs": [
+    {
+     "name": "stg_device_event",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "dim_device",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "model",
+   "schema": "marts",
+   "unique_id": "model.telemetry.fct_device_event"
+  },
+  "model.telemetry.fct_device_minute": {
+   "columns": {
+    "device_id": {
+     "description": "Natural device id.",
+     "name": "device_id"
+    },
+    "device_key": {
+     "description": "FK to dim_device: the device version live at this minute (as-of join).",
+     "name": "device_key"
+    },
+    "device_minute_id": {
+     "description": "Surrogate primary key (hash of device_id and minute_ts).",
+     "name": "device_minute_id"
+    },
+    "event_date": {
+     "description": "UTC date of minute_ts.",
+     "name": "event_date"
+    },
+    "firmware_version": {
+     "description": "Firmware reported by the samples of this minute.",
+     "name": "firmware_version"
+    },
+    "fix_valid": {
+     "description": "GPS fix was valid this minute.",
+     "name": "fix_valid"
+    },
+    "ip_assigned": {
+     "description": "LTE data session had an IP address during this minute's sample.",
+     "name": "ip_assigned"
+    },
+    "lte_lost": {
+     "description": "True when `registered = false OR ip_assigned = false` (connectivity lost this minute).",
+     "name": "lte_lost"
+    },
+    "minute_ts": {
+     "description": "UTC minute (timestamp truncated to the minute).",
+     "name": "minute_ts"
+    },
+    "registered": {
+     "description": "LTE modem registered on the network during this minute's sample.",
+     "name": "registered"
+    },
+    "speed_kmh": {
+     "description": "GPS speed, km/h.",
+     "name": "speed_kmh"
+    },
+    "temp_c": {
+     "description": "Board temperature, degrees Celsius.",
+     "name": "temp_c"
+    }
+   },
+   "description": "Fact at device x minute grain for minutes with ignition on (the device was driving). Joins the heartbeat, LTE and GPS samples of that minute. A \"drive minute\" is one row here.\n",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "fct_device_minute"
+   ],
+   "name": "fct_device_minute",
+   "primary_key": [
+    "device_id",
+    "device_minute_id",
+    "minute_ts"
+   ],
+   "refs": [
+    {
+     "name": "stg_heartbeat",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "stg_lte",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "stg_gps",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "dim_device",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "model",
+   "schema": "marts",
+   "unique_id": "model.telemetry.fct_device_minute"
+  },
+  "model.telemetry.fct_firmware_daily": {
+   "columns": {
+    "crash_count": {
+     "description": "CAM_CRASH events produced by this firmware on this model that day.",
+     "name": "crash_count"
+    },
+    "crash_rate_per_100_device_days": {
+     "description": "crash_count / device_days * 100.",
+     "name": "crash_rate_per_100_device_days"
+    },
+    "device_count": {
+     "description": "Distinct devices that drove on this firmware and model that day.",
+     "name": "device_count"
+    },
+    "device_days": {
+     "description": "Device-days on this firmware and model (a device that upgraded mid-day counts once per version).",
+     "name": "device_days"
+    },
+    "event_date": {
+     "description": "UTC day.",
+     "name": "event_date"
+    },
+    "firmware_version": {
+     "description": "FK to dim_firmware.",
+     "name": "firmware_version"
+    },
+    "hardware_model": {
+     "description": "Hardware model.",
+     "name": "hardware_model"
+    },
+    "mean_lte_loss_pct": {
+     "description": "Mean of the per-device-day lte_loss_pct (see fct_device_daily) on this firmware and model.",
+     "name": "mean_lte_loss_pct"
+    }
+   },
+   "description": "Aggregate fact at firmware_version x hardware_model x day grain: how healthy each firmware is on each model. Use it for \"before vs after the 1.1.0 upgrade\" questions.\n",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "fct_firmware_daily"
+   ],
+   "name": "fct_firmware_daily",
+   "primary_key": [
+    "firmware_version",
+    "hardware_model"
+   ],
+   "refs": [
+    {
+     "name": "fct_device_minute",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "fct_device_event",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "model",
+   "schema": "marts",
+   "unique_id": "model.telemetry.fct_firmware_daily"
+  },
+  "model.telemetry.fct_trip": {
+   "columns": {
+    "avg_speed_kmh": {
+     "description": "distance_km / duration in hours.",
+     "name": "avg_speed_kmh"
+    },
+    "device_key": {
+     "description": "FK to dim_device, as of trip start.",
+     "name": "device_key"
+    },
+    "distance_km": {
+     "description": "Odometer difference between trip_end and trip_start, km.",
+     "name": "distance_km"
+    },
+    "duration_min": {
+     "description": "Minutes from trip_start to trip_end; null when the trip is incomplete.",
+     "name": "duration_min"
+    },
+    "is_complete": {
+     "description": "Both trip_start and trip_end were loaded.",
+     "name": "is_complete"
+    },
+    "trip_date": {
+     "description": "UTC date the trip started (or ended, if its start is not loaded).",
+     "name": "trip_date"
+    },
+    "trip_id": {
+     "description": "Primary key.",
+     "name": "trip_id"
+    }
+   },
+   "description": "Fact with one row per trip (ignition on to ignition off).",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "fct_trip"
+   ],
+   "name": "fct_trip",
+   "primary_key": [
+    "trip_id"
+   ],
+   "refs": [
+    {
+     "name": "stg_trip",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "dim_device",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "model",
+   "schema": "marts",
+   "unique_id": "model.telemetry.fct_trip"
+  },
+  "model.telemetry.stg_device_event": {
+   "columns": {
+    "event_code": {
+     "description": "",
+     "name": "event_code"
+    },
+    "event_id": {
+     "description": "",
+     "name": "event_id"
+    },
+    "event_type": {
+     "description": "",
+     "name": "event_type"
+    },
+    "severity": {
+     "description": "",
+     "name": "severity"
+    }
+   },
+   "description": "Typed device events from silver. One row per device_event.",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "stg_device_event"
+   ],
+   "name": "stg_device_event",
+   "primary_key": [
+    "event_id"
+   ],
+   "refs": [],
+   "resource_type": "model",
+   "schema": "staging",
+   "unique_id": "model.telemetry.stg_device_event"
+  },
+  "model.telemetry.stg_firmware_releases": {
+   "columns": {
+    "firmware_version": {
+     "description": "",
+     "name": "firmware_version"
+    }
+   },
+   "description": "Firmware versions and release dates from the OTA export.",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "stg_firmware_releases"
+   ],
+   "name": "stg_firmware_releases",
+   "primary_key": [
+    "firmware_version"
+   ],
+   "refs": [],
+   "resource_type": "model",
+   "schema": "staging",
+   "unique_id": "model.telemetry.stg_firmware_releases"
+  },
+  "model.telemetry.stg_fleet_registry": {
+   "columns": {
+    "device_id": {
+     "description": "",
+     "name": "device_id"
+    },
+    "hardware_model": {
+     "description": "",
+     "name": "hardware_model"
+    }
+   },
+   "description": "Provisioned devices from the fleet registry export.",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "stg_fleet_registry"
+   ],
+   "name": "stg_fleet_registry",
+   "primary_key": [
+    "device_id"
+   ],
+   "refs": [],
+   "resource_type": "model",
+   "schema": "staging",
+   "unique_id": "model.telemetry.stg_fleet_registry"
+  },
+  "model.telemetry.stg_gps": {
+   "columns": {
+    "event_id": {
+     "description": "",
+     "name": "event_id"
+    },
+    "event_type": {
+     "description": "",
+     "name": "event_type"
+    }
+   },
+   "description": "Typed GNSS fixes from silver. One row per gps_fix event.",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "stg_gps"
+   ],
+   "name": "stg_gps",
+   "primary_key": [
+    "event_id"
+   ],
+   "refs": [],
+   "resource_type": "model",
+   "schema": "staging",
+   "unique_id": "model.telemetry.stg_gps"
+  },
+  "model.telemetry.stg_heartbeat": {
+   "columns": {
+    "event_id": {
+     "description": "",
+     "name": "event_id"
+    },
+    "event_type": {
+     "description": "",
+     "name": "event_type"
+    },
+    "minute_ts": {
+     "description": "event_ts truncated to the minute; join key for fct_device_minute.",
+     "name": "minute_ts"
+    },
+    "temp_c": {
+     "description": "Board temperature in degrees Celsius.",
+     "name": "temp_c"
+    }
+   },
+   "description": "Typed heartbeat samples from silver. One row per heartbeat event.",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "stg_heartbeat"
+   ],
+   "name": "stg_heartbeat",
+   "primary_key": [
+    "event_id"
+   ],
+   "refs": [],
+   "resource_type": "model",
+   "schema": "staging",
+   "unique_id": "model.telemetry.stg_heartbeat"
+  },
+  "model.telemetry.stg_lte": {
+   "columns": {
+    "event_id": {
+     "description": "",
+     "name": "event_id"
+    },
+    "event_type": {
+     "description": "",
+     "name": "event_type"
+    },
+    "ip_assigned": {
+     "description": "Modem has an IP address (data session up).",
+     "name": "ip_assigned"
+    },
+    "registered": {
+     "description": "Modem registered on the cellular network.",
+     "name": "registered"
+    }
+   },
+   "description": "Typed LTE modem samples from silver. One row per lte_sample event.",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "stg_lte"
+   ],
+   "name": "stg_lte",
+   "primary_key": [
+    "event_id"
+   ],
+   "refs": [],
+   "resource_type": "model",
+   "schema": "staging",
+   "unique_id": "model.telemetry.stg_lte"
+  },
+  "model.telemetry.stg_trip": {
+   "columns": {
+    "trip_id": {
+     "description": "",
+     "name": "trip_id"
+    }
+   },
+   "description": "One row per trip, pairing trip_start and trip_end.",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "stg_trip"
+   ],
+   "name": "stg_trip",
+   "primary_key": [
+    "trip_id"
+   ],
+   "refs": [],
+   "resource_type": "model",
+   "schema": "staging",
+   "unique_id": "model.telemetry.stg_trip"
+  },
+  "seed.telemetry.dim_event_code": {
+   "columns": {
+    "category": {
+     "description": "Subsystem the code belongs to (camera, system, thermal, firmware, storage).",
+     "name": "category"
+    },
+    "description": {
+     "description": "Human-readable meaning of the code.",
+     "name": "description"
+    },
+    "event_code": {
+     "description": "Primary key. Code reported by the device, e.g. CAM_CRASH.",
+     "name": "event_code"
+    },
+    "severity": {
+     "description": "Default severity of the code.",
+     "name": "severity"
+    }
+   },
+   "description": "Dimension of device event codes (seed). One row per event_code.",
+   "fqn": [
+    "telemetry",
+    "dim_event_code"
+   ],
+   "name": "dim_event_code",
+   "resource_type": "seed",
+   "schema": "marts",
+   "unique_id": "seed.telemetry.dim_event_code"
+  },
+  "seed.telemetry.dim_region": {
+   "columns": {
+    "region_id": {
+     "description": "Primary key, e.g. us-west.",
+     "name": "region_id"
+    },
+    "region_name": {
+     "description": "Display name of the region.",
+     "name": "region_name"
+    },
+    "timezone": {
+     "description": "IANA timezone used for local-time questions (trips follow local daytime).",
+     "name": "timezone"
+    }
+   },
+   "description": "Dimension of operating regions (seed). One row per region_id.",
+   "fqn": [
+    "telemetry",
+    "dim_region"
+   ],
+   "name": "dim_region",
+   "resource_type": "seed",
+   "schema": "marts",
+   "unique_id": "seed.telemetry.dim_region"
+  },
+  "snapshot.telemetry.dim_device_snapshot": {
+   "columns": {
+    "dbt_scd_id": {
+     "description": "",
+     "name": "dbt_scd_id"
+    }
+   },
+   "description": "SCD2 snapshot of device firmware. Read through the dim_device model.",
+   "fqn": [
+    "telemetry",
+    "dim_device_snapshot",
+    "dim_device_snapshot"
+   ],
+   "name": "dim_device_snapshot",
+   "refs": [],
+   "resource_type": "snapshot",
+   "schema": "snapshots",
+   "unique_id": "snapshot.telemetry.dim_device_snapshot"
+  },
+  "test.telemetry.accepted_values_dim_device_hardware_model__TX_100__TX_200__TX_300.9261985433": {
+   "attached_node": "model.telemetry.dim_device",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "accepted_values_dim_device_hardware_model__TX_100__TX_200__TX_300"
+   ],
+   "name": "accepted_values_dim_device_hardware_model__TX_100__TX_200__TX_300",
+   "refs": [
+    {
+     "name": "dim_device",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "hardware_model",
+     "model": "{{ get_where_subquery(ref('dim_device')) }}",
+     "values": [
+      "TX-100",
+      "TX-200",
+      "TX-300"
+     ]
+    },
+    "name": "accepted_values",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.accepted_values_dim_device_hardware_model__TX_100__TX_200__TX_300.9261985433"
+  },
+  "test.telemetry.accepted_values_dim_event_code_severity__info__warning__error__critical.5e891aefea": {
+   "attached_node": "seed.telemetry.dim_event_code",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "accepted_values_dim_event_code_severity__info__warning__error__critical"
+   ],
+   "name": "accepted_values_dim_event_code_severity__info__warning__error__critical",
+   "refs": [
+    {
+     "name": "dim_event_code",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "severity",
+     "model": "{{ get_where_subquery(ref('dim_event_code')) }}",
+     "values": [
+      "info",
+      "warning",
+      "error",
+      "critical"
+     ]
+    },
+    "name": "accepted_values",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.accepted_values_dim_event_code_severity__info__warning__error__critical.5e891aefea"
+  },
+  "test.telemetry.accepted_values_fct_device_event_event_code__CAM_CRASH__REBOOT__LOW_MEMORY__OVERHEAT__FW_UPDATE__SD_CARD_ERROR.6f00e85386": {
+   "attached_node": "model.telemetry.fct_device_event",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "accepted_values_fct_device_event_event_code__CAM_CRASH__REBOOT__LOW_MEMORY__OVERHEAT__FW_UPDATE__SD_CARD_ERROR"
+   ],
+   "name": "accepted_values_fct_device_event_event_code__CAM_CRASH__REBOOT__LOW_MEMORY__OVERHEAT__FW_UPDATE__SD_CARD_ERROR",
+   "refs": [
+    {
+     "name": "fct_device_event",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_code",
+     "model": "{{ get_where_subquery(ref('fct_device_event')) }}",
+     "values": [
+      "CAM_CRASH",
+      "REBOOT",
+      "LOW_MEMORY",
+      "OVERHEAT",
+      "FW_UPDATE",
+      "SD_CARD_ERROR"
+     ]
+    },
+    "name": "accepted_values",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.accepted_values_fct_device_event_event_code__CAM_CRASH__REBOOT__LOW_MEMORY__OVERHEAT__FW_UPDATE__SD_CARD_ERROR.6f00e85386"
+  },
+  "test.telemetry.accepted_values_fct_device_event_severity__info__warning__error__critical.d055c5cd7f": {
+   "attached_node": "model.telemetry.fct_device_event",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "accepted_values_fct_device_event_severity__info__warning__error__critical"
+   ],
+   "name": "accepted_values_fct_device_event_severity__info__warning__error__critical",
+   "refs": [
+    {
+     "name": "fct_device_event",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "severity",
+     "model": "{{ get_where_subquery(ref('fct_device_event')) }}",
+     "values": [
+      "info",
+      "warning",
+      "error",
+      "critical"
+     ]
+    },
+    "name": "accepted_values",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.accepted_values_fct_device_event_severity__info__warning__error__critical.d055c5cd7f"
+  },
+  "test.telemetry.accepted_values_stg_device_event_event_code__CAM_CRASH__REBOOT__LOW_MEMORY__OVERHEAT__FW_UPDATE__SD_CARD_ERROR.ddccb68635": {
+   "attached_node": "model.telemetry.stg_device_event",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "accepted_values_stg_device_event_event_code__CAM_CRASH__REBOOT__LOW_MEMORY__OVERHEAT__FW_UPDATE__SD_CARD_ERROR"
+   ],
+   "name": "accepted_values_stg_device_event_event_code__CAM_CRASH__REBOOT__LOW_MEMORY__OVERHEAT__FW_UPDATE__SD_CARD_ERROR",
+   "refs": [
+    {
+     "name": "stg_device_event",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_code",
+     "model": "{{ get_where_subquery(ref('stg_device_event')) }}",
+     "values": [
+      "CAM_CRASH",
+      "REBOOT",
+      "LOW_MEMORY",
+      "OVERHEAT",
+      "FW_UPDATE",
+      "SD_CARD_ERROR"
+     ]
+    },
+    "name": "accepted_values",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.accepted_values_stg_device_event_event_code__CAM_CRASH__REBOOT__LOW_MEMORY__OVERHEAT__FW_UPDATE__SD_CARD_ERROR.ddccb68635"
+  },
+  "test.telemetry.accepted_values_stg_device_event_event_type__device_event.da0a843c73": {
+   "attached_node": "model.telemetry.stg_device_event",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "accepted_values_stg_device_event_event_type__device_event"
+   ],
+   "name": "accepted_values_stg_device_event_event_type__device_event",
+   "refs": [
+    {
+     "name": "stg_device_event",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_type",
+     "model": "{{ get_where_subquery(ref('stg_device_event')) }}",
+     "values": [
+      "device_event"
+     ]
+    },
+    "name": "accepted_values",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.accepted_values_stg_device_event_event_type__device_event.da0a843c73"
+  },
+  "test.telemetry.accepted_values_stg_device_event_severity__info__warning__error__critical.0e1f675f32": {
+   "attached_node": "model.telemetry.stg_device_event",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "accepted_values_stg_device_event_severity__info__warning__error__critical"
+   ],
+   "name": "accepted_values_stg_device_event_severity__info__warning__error__critical",
+   "refs": [
+    {
+     "name": "stg_device_event",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "severity",
+     "model": "{{ get_where_subquery(ref('stg_device_event')) }}",
+     "values": [
+      "info",
+      "warning",
+      "error",
+      "critical"
+     ]
+    },
+    "name": "accepted_values",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.accepted_values_stg_device_event_severity__info__warning__error__critical.0e1f675f32"
+  },
+  "test.telemetry.accepted_values_stg_fleet_registry_hardware_model__TX_100__TX_200__TX_300.581b3dfe1d": {
+   "attached_node": "model.telemetry.stg_fleet_registry",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "accepted_values_stg_fleet_registry_hardware_model__TX_100__TX_200__TX_300"
+   ],
+   "name": "accepted_values_stg_fleet_registry_hardware_model__TX_100__TX_200__TX_300",
+   "refs": [
+    {
+     "name": "stg_fleet_registry",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "hardware_model",
+     "model": "{{ get_where_subquery(ref('stg_fleet_registry')) }}",
+     "values": [
+      "TX-100",
+      "TX-200",
+      "TX-300"
+     ]
+    },
+    "name": "accepted_values",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.accepted_values_stg_fleet_registry_hardware_model__TX_100__TX_200__TX_300.581b3dfe1d"
+  },
+  "test.telemetry.accepted_values_stg_gps_event_type__gps_fix.b1a07b2704": {
+   "attached_node": "model.telemetry.stg_gps",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "accepted_values_stg_gps_event_type__gps_fix"
+   ],
+   "name": "accepted_values_stg_gps_event_type__gps_fix",
+   "refs": [
+    {
+     "name": "stg_gps",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_type",
+     "model": "{{ get_where_subquery(ref('stg_gps')) }}",
+     "values": [
+      "gps_fix"
+     ]
+    },
+    "name": "accepted_values",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.accepted_values_stg_gps_event_type__gps_fix.b1a07b2704"
+  },
+  "test.telemetry.accepted_values_stg_heartbeat_event_type__heartbeat.a77c5fb201": {
+   "attached_node": "model.telemetry.stg_heartbeat",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "accepted_values_stg_heartbeat_event_type__heartbeat"
+   ],
+   "name": "accepted_values_stg_heartbeat_event_type__heartbeat",
+   "refs": [
+    {
+     "name": "stg_heartbeat",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_type",
+     "model": "{{ get_where_subquery(ref('stg_heartbeat')) }}",
+     "values": [
+      "heartbeat"
+     ]
+    },
+    "name": "accepted_values",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.accepted_values_stg_heartbeat_event_type__heartbeat.a77c5fb201"
+  },
+  "test.telemetry.accepted_values_stg_lte_event_type__lte_sample.e1c8ff45db": {
+   "attached_node": "model.telemetry.stg_lte",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "accepted_values_stg_lte_event_type__lte_sample"
+   ],
+   "name": "accepted_values_stg_lte_event_type__lte_sample",
+   "refs": [
+    {
+     "name": "stg_lte",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_type",
+     "model": "{{ get_where_subquery(ref('stg_lte')) }}",
+     "values": [
+      "lte_sample"
+     ]
+    },
+    "name": "accepted_values",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.accepted_values_stg_lte_event_type__lte_sample.e1c8ff45db"
+  },
+  "test.telemetry.dbt_utils_accepted_range_fct_device_daily_avg_temp_c__125___40.97dfcd38d3": {
+   "attached_node": "model.telemetry.fct_device_daily",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "dbt_utils_accepted_range_fct_device_daily_avg_temp_c__125___40"
+   ],
+   "name": "dbt_utils_accepted_range_fct_device_daily_avg_temp_c__125___40",
+   "refs": [
+    {
+     "name": "fct_device_daily",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "avg_temp_c",
+     "max_value": 125,
+     "min_value": -40,
+     "model": "{{ get_where_subquery(ref('fct_device_daily')) }}"
+    },
+    "name": "accepted_range",
+    "namespace": "dbt_utils"
+   },
+   "unique_id": "test.telemetry.dbt_utils_accepted_range_fct_device_daily_avg_temp_c__125___40.97dfcd38d3"
+  },
+  "test.telemetry.dbt_utils_accepted_range_fct_device_daily_gps_valid_pct__100__0.eba0368f4e": {
+   "attached_node": "model.telemetry.fct_device_daily",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "dbt_utils_accepted_range_fct_device_daily_gps_valid_pct__100__0"
+   ],
+   "name": "dbt_utils_accepted_range_fct_device_daily_gps_valid_pct__100__0",
+   "refs": [
+    {
+     "name": "fct_device_daily",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "gps_valid_pct",
+     "max_value": 100,
+     "min_value": 0,
+     "model": "{{ get_where_subquery(ref('fct_device_daily')) }}"
+    },
+    "name": "accepted_range",
+    "namespace": "dbt_utils"
+   },
+   "unique_id": "test.telemetry.dbt_utils_accepted_range_fct_device_daily_gps_valid_pct__100__0.eba0368f4e"
+  },
+  "test.telemetry.dbt_utils_accepted_range_fct_device_daily_lte_loss_pct__100__0.32c629b254": {
+   "attached_node": "model.telemetry.fct_device_daily",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "dbt_utils_accepted_range_fct_device_daily_lte_loss_pct__100__0"
+   ],
+   "name": "dbt_utils_accepted_range_fct_device_daily_lte_loss_pct__100__0",
+   "refs": [
+    {
+     "name": "fct_device_daily",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "lte_loss_pct",
+     "max_value": 100,
+     "min_value": 0,
+     "model": "{{ get_where_subquery(ref('fct_device_daily')) }}"
+    },
+    "name": "accepted_range",
+    "namespace": "dbt_utils"
+   },
+   "unique_id": "test.telemetry.dbt_utils_accepted_range_fct_device_daily_lte_loss_pct__100__0.32c629b254"
+  },
+  "test.telemetry.dbt_utils_accepted_range_fct_device_daily_max_temp_c__125___40.c8cfeb96ca": {
+   "attached_node": "model.telemetry.fct_device_daily",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "dbt_utils_accepted_range_fct_device_daily_max_temp_c__125___40"
+   ],
+   "name": "dbt_utils_accepted_range_fct_device_daily_max_temp_c__125___40",
+   "refs": [
+    {
+     "name": "fct_device_daily",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "max_temp_c",
+     "max_value": 125,
+     "min_value": -40,
+     "model": "{{ get_where_subquery(ref('fct_device_daily')) }}"
+    },
+    "name": "accepted_range",
+    "namespace": "dbt_utils"
+   },
+   "unique_id": "test.telemetry.dbt_utils_accepted_range_fct_device_daily_max_temp_c__125___40.c8cfeb96ca"
+  },
+  "test.telemetry.dbt_utils_accepted_range_fct_device_minute_temp_c__125___40.b29ab1eb62": {
+   "attached_node": "model.telemetry.fct_device_minute",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "dbt_utils_accepted_range_fct_device_minute_temp_c__125___40"
+   ],
+   "name": "dbt_utils_accepted_range_fct_device_minute_temp_c__125___40",
+   "refs": [
+    {
+     "name": "fct_device_minute",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "temp_c",
+     "max_value": 125,
+     "min_value": -40,
+     "model": "{{ get_where_subquery(ref('fct_device_minute')) }}"
+    },
+    "name": "accepted_range",
+    "namespace": "dbt_utils"
+   },
+   "unique_id": "test.telemetry.dbt_utils_accepted_range_fct_device_minute_temp_c__125___40.b29ab1eb62"
+  },
+  "test.telemetry.dbt_utils_accepted_range_fct_firmware_daily_crash_rate_per_100_device_days__0.be7eb3a072": {
+   "attached_node": "model.telemetry.fct_firmware_daily",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "dbt_utils_accepted_range_fct_firmware_daily_crash_rate_per_100_device_days__0"
+   ],
+   "name": "dbt_utils_accepted_range_fct_firmware_daily_crash_rate_per_100_device_days__0",
+   "refs": [
+    {
+     "name": "fct_firmware_daily",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "crash_rate_per_100_device_days",
+     "min_value": 0,
+     "model": "{{ get_where_subquery(ref('fct_firmware_daily')) }}"
+    },
+    "name": "accepted_range",
+    "namespace": "dbt_utils"
+   },
+   "unique_id": "test.telemetry.dbt_utils_accepted_range_fct_firmware_daily_crash_rate_per_100_device_days__0.be7eb3a072"
+  },
+  "test.telemetry.dbt_utils_accepted_range_fct_firmware_daily_mean_lte_loss_pct__100__0.dfb2499486": {
+   "attached_node": "model.telemetry.fct_firmware_daily",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "dbt_utils_accepted_range_fct_firmware_daily_mean_lte_loss_pct__100__0"
+   ],
+   "name": "dbt_utils_accepted_range_fct_firmware_daily_mean_lte_loss_pct__100__0",
+   "refs": [
+    {
+     "name": "fct_firmware_daily",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "mean_lte_loss_pct",
+     "max_value": 100,
+     "min_value": 0,
+     "model": "{{ get_where_subquery(ref('fct_firmware_daily')) }}"
+    },
+    "name": "accepted_range",
+    "namespace": "dbt_utils"
+   },
+   "unique_id": "test.telemetry.dbt_utils_accepted_range_fct_firmware_daily_mean_lte_loss_pct__100__0.dfb2499486"
+  },
+  "test.telemetry.dbt_utils_accepted_range_fct_trip_avg_speed_kmh__200__0.65b36ae2ea": {
+   "attached_node": "model.telemetry.fct_trip",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "dbt_utils_accepted_range_fct_trip_avg_speed_kmh__200__0"
+   ],
+   "name": "dbt_utils_accepted_range_fct_trip_avg_speed_kmh__200__0",
+   "refs": [
+    {
+     "name": "fct_trip",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "avg_speed_kmh",
+     "max_value": 200,
+     "min_value": 0,
+     "model": "{{ get_where_subquery(ref('fct_trip')) }}"
+    },
+    "name": "accepted_range",
+    "namespace": "dbt_utils"
+   },
+   "unique_id": "test.telemetry.dbt_utils_accepted_range_fct_trip_avg_speed_kmh__200__0.65b36ae2ea"
+  },
+  "test.telemetry.dbt_utils_accepted_range_fct_trip_distance_km__0.602b701282": {
+   "attached_node": "model.telemetry.fct_trip",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "dbt_utils_accepted_range_fct_trip_distance_km__0"
+   ],
+   "name": "dbt_utils_accepted_range_fct_trip_distance_km__0",
+   "refs": [
+    {
+     "name": "fct_trip",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "distance_km",
+     "min_value": 0,
+     "model": "{{ get_where_subquery(ref('fct_trip')) }}"
+    },
+    "name": "accepted_range",
+    "namespace": "dbt_utils"
+   },
+   "unique_id": "test.telemetry.dbt_utils_accepted_range_fct_trip_distance_km__0.602b701282"
+  },
+  "test.telemetry.dbt_utils_accepted_range_stg_heartbeat_temp_c__125___40.c878768270": {
+   "attached_node": "model.telemetry.stg_heartbeat",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "dbt_utils_accepted_range_stg_heartbeat_temp_c__125___40"
+   ],
+   "name": "dbt_utils_accepted_range_stg_heartbeat_temp_c__125___40",
+   "refs": [
+    {
+     "name": "stg_heartbeat",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "temp_c",
+     "max_value": 125,
+     "min_value": -40,
+     "model": "{{ get_where_subquery(ref('stg_heartbeat')) }}"
+    },
+    "name": "accepted_range",
+    "namespace": "dbt_utils"
+   },
+   "unique_id": "test.telemetry.dbt_utils_accepted_range_stg_heartbeat_temp_c__125___40.c878768270"
+  },
+  "test.telemetry.dbt_utils_unique_combination_of_columns_fct_device_daily_device_id__event_date.f2d2fe1e59": {
+   "attached_node": "model.telemetry.fct_device_daily",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "dbt_utils_unique_combination_of_columns_fct_device_daily_device_id__event_date"
+   ],
+   "name": "dbt_utils_unique_combination_of_columns_fct_device_daily_device_id__event_date",
+   "refs": [
+    {
+     "name": "fct_device_daily",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "combination_of_columns": [
+      "device_id",
+      "event_date"
+     ],
+     "model": "{{ get_where_subquery(ref('fct_device_daily')) }}"
+    },
+    "name": "unique_combination_of_columns",
+    "namespace": "dbt_utils"
+   },
+   "unique_id": "test.telemetry.dbt_utils_unique_combination_of_columns_fct_device_daily_device_id__event_date.f2d2fe1e59"
+  },
+  "test.telemetry.dbt_utils_unique_combination_of_columns_fct_device_minute_device_id__minute_ts.f5d6392d79": {
+   "attached_node": "model.telemetry.fct_device_minute",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "dbt_utils_unique_combination_of_columns_fct_device_minute_device_id__minute_ts"
+   ],
+   "name": "dbt_utils_unique_combination_of_columns_fct_device_minute_device_id__minute_ts",
+   "refs": [
+    {
+     "name": "fct_device_minute",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "combination_of_columns": [
+      "device_id",
+      "minute_ts"
+     ],
+     "model": "{{ get_where_subquery(ref('fct_device_minute')) }}"
+    },
+    "name": "unique_combination_of_columns",
+    "namespace": "dbt_utils"
+   },
+   "unique_id": "test.telemetry.dbt_utils_unique_combination_of_columns_fct_device_minute_device_id__minute_ts.f5d6392d79"
+  },
+  "test.telemetry.dbt_utils_unique_combination_of_columns_fct_firmware_daily_firmware_version__hardware_model__event_date.3194c24775": {
+   "attached_node": "model.telemetry.fct_firmware_daily",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "dbt_utils_unique_combination_of_columns_fct_firmware_daily_firmware_version__hardware_model__event_date"
+   ],
+   "name": "dbt_utils_unique_combination_of_columns_fct_firmware_daily_firmware_version__hardware_model__event_date",
+   "refs": [
+    {
+     "name": "fct_firmware_daily",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "combination_of_columns": [
+      "firmware_version",
+      "hardware_model",
+      "event_date"
+     ],
+     "model": "{{ get_where_subquery(ref('fct_firmware_daily')) }}"
+    },
+    "name": "unique_combination_of_columns",
+    "namespace": "dbt_utils"
+   },
+   "unique_id": "test.telemetry.dbt_utils_unique_combination_of_columns_fct_firmware_daily_firmware_version__hardware_model__event_date.3194c24775"
+  },
+  "test.telemetry.not_null_dim_date_date_day.e3f312efb2": {
+   "attached_node": "model.telemetry.dim_date",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "not_null_dim_date_date_day"
+   ],
+   "name": "not_null_dim_date_date_day",
+   "refs": [
+    {
+     "name": "dim_date",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "date_day",
+     "model": "{{ get_where_subquery(ref('dim_date')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_dim_date_date_day.e3f312efb2"
+  },
+  "test.telemetry.not_null_dim_device_device_id.00820bad1b": {
+   "attached_node": "model.telemetry.dim_device",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "not_null_dim_device_device_id"
+   ],
+   "name": "not_null_dim_device_device_id",
+   "refs": [
+    {
+     "name": "dim_device",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "device_id",
+     "model": "{{ get_where_subquery(ref('dim_device')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_dim_device_device_id.00820bad1b"
+  },
+  "test.telemetry.not_null_dim_device_device_key.33cec17833": {
+   "attached_node": "model.telemetry.dim_device",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "not_null_dim_device_device_key"
+   ],
+   "name": "not_null_dim_device_device_key",
+   "refs": [
+    {
+     "name": "dim_device",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "device_key",
+     "model": "{{ get_where_subquery(ref('dim_device')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_dim_device_device_key.33cec17833"
+  },
+  "test.telemetry.not_null_dim_device_firmware_version.d63424970d": {
+   "attached_node": "model.telemetry.dim_device",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "not_null_dim_device_firmware_version"
+   ],
+   "name": "not_null_dim_device_firmware_version",
+   "refs": [
+    {
+     "name": "dim_device",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "firmware_version",
+     "model": "{{ get_where_subquery(ref('dim_device')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_dim_device_firmware_version.d63424970d"
+  },
+  "test.telemetry.not_null_dim_device_snapshot_dbt_scd_id.d1e665ae20": {
+   "attached_node": "snapshot.telemetry.dim_device_snapshot",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "not_null_dim_device_snapshot_dbt_scd_id"
+   ],
+   "name": "not_null_dim_device_snapshot_dbt_scd_id",
+   "refs": [
+    {
+     "name": "dim_device_snapshot",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "dbt_scd_id",
+     "model": "{{ get_where_subquery(ref('dim_device_snapshot')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_dim_device_snapshot_dbt_scd_id.d1e665ae20"
+  },
+  "test.telemetry.not_null_dim_device_valid_from.fb620917a5": {
+   "attached_node": "model.telemetry.dim_device",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "not_null_dim_device_valid_from"
+   ],
+   "name": "not_null_dim_device_valid_from",
+   "refs": [
+    {
+     "name": "dim_device",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "valid_from",
+     "model": "{{ get_where_subquery(ref('dim_device')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_dim_device_valid_from.fb620917a5"
+  },
+  "test.telemetry.not_null_dim_device_valid_to.6c0e90ab0e": {
+   "attached_node": "model.telemetry.dim_device",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "not_null_dim_device_valid_to"
+   ],
+   "name": "not_null_dim_device_valid_to",
+   "refs": [
+    {
+     "name": "dim_device",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "valid_to",
+     "model": "{{ get_where_subquery(ref('dim_device')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_dim_device_valid_to.6c0e90ab0e"
+  },
+  "test.telemetry.not_null_dim_event_code_category.b40cbfcaaa": {
+   "attached_node": "seed.telemetry.dim_event_code",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "not_null_dim_event_code_category"
+   ],
+   "name": "not_null_dim_event_code_category",
+   "refs": [
+    {
+     "name": "dim_event_code",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "category",
+     "model": "{{ get_where_subquery(ref('dim_event_code')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_dim_event_code_category.b40cbfcaaa"
+  },
+  "test.telemetry.not_null_dim_event_code_event_code.3b25b5470e": {
+   "attached_node": "seed.telemetry.dim_event_code",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "not_null_dim_event_code_event_code"
+   ],
+   "name": "not_null_dim_event_code_event_code",
+   "refs": [
+    {
+     "name": "dim_event_code",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_code",
+     "model": "{{ get_where_subquery(ref('dim_event_code')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_dim_event_code_event_code.3b25b5470e"
+  },
+  "test.telemetry.not_null_dim_firmware_firmware_version.5a167c3517": {
+   "attached_node": "model.telemetry.dim_firmware",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "not_null_dim_firmware_firmware_version"
+   ],
+   "name": "not_null_dim_firmware_firmware_version",
+   "refs": [
+    {
+     "name": "dim_firmware",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "firmware_version",
+     "model": "{{ get_where_subquery(ref('dim_firmware')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_dim_firmware_firmware_version.5a167c3517"
+  },
+  "test.telemetry.not_null_dim_firmware_release_date.e232399e9f": {
+   "attached_node": "model.telemetry.dim_firmware",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "not_null_dim_firmware_release_date"
+   ],
+   "name": "not_null_dim_firmware_release_date",
+   "refs": [
+    {
+     "name": "dim_firmware",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "release_date",
+     "model": "{{ get_where_subquery(ref('dim_firmware')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_dim_firmware_release_date.e232399e9f"
+  },
+  "test.telemetry.not_null_dim_region_region_id.7ad4ca105d": {
+   "attached_node": "seed.telemetry.dim_region",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "not_null_dim_region_region_id"
+   ],
+   "name": "not_null_dim_region_region_id",
+   "refs": [
+    {
+     "name": "dim_region",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "region_id",
+     "model": "{{ get_where_subquery(ref('dim_region')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_dim_region_region_id.7ad4ca105d"
+  },
+  "test.telemetry.not_null_fct_device_daily_device_id.93d51bd65b": {
+   "attached_node": "model.telemetry.fct_device_daily",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "not_null_fct_device_daily_device_id"
+   ],
+   "name": "not_null_fct_device_daily_device_id",
+   "refs": [
+    {
+     "name": "fct_device_daily",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "device_id",
+     "model": "{{ get_where_subquery(ref('fct_device_daily')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_fct_device_daily_device_id.93d51bd65b"
+  },
+  "test.telemetry.not_null_fct_device_daily_event_date.0e43118623": {
+   "attached_node": "model.telemetry.fct_device_daily",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "not_null_fct_device_daily_event_date"
+   ],
+   "name": "not_null_fct_device_daily_event_date",
+   "refs": [
+    {
+     "name": "fct_device_daily",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_date",
+     "model": "{{ get_where_subquery(ref('fct_device_daily')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_fct_device_daily_event_date.0e43118623"
+  },
+  "test.telemetry.not_null_fct_device_event_device_key.27c67ef64d": {
+   "attached_node": "model.telemetry.fct_device_event",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "not_null_fct_device_event_device_key"
+   ],
+   "name": "not_null_fct_device_event_device_key",
+   "refs": [
+    {
+     "name": "fct_device_event",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "device_key",
+     "model": "{{ get_where_subquery(ref('fct_device_event')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_fct_device_event_device_key.27c67ef64d"
+  },
+  "test.telemetry.not_null_fct_device_event_event_code.e04c01f06f": {
+   "attached_node": "model.telemetry.fct_device_event",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "not_null_fct_device_event_event_code"
+   ],
+   "name": "not_null_fct_device_event_event_code",
+   "refs": [
+    {
+     "name": "fct_device_event",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_code",
+     "model": "{{ get_where_subquery(ref('fct_device_event')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_fct_device_event_event_code.e04c01f06f"
+  },
+  "test.telemetry.not_null_fct_device_event_event_id.36a862078d": {
+   "attached_node": "model.telemetry.fct_device_event",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "not_null_fct_device_event_event_id"
+   ],
+   "name": "not_null_fct_device_event_event_id",
+   "refs": [
+    {
+     "name": "fct_device_event",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_id",
+     "model": "{{ get_where_subquery(ref('fct_device_event')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_fct_device_event_event_id.36a862078d"
+  },
+  "test.telemetry.not_null_fct_device_minute_device_id.b97152ee26": {
+   "attached_node": "model.telemetry.fct_device_minute",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "not_null_fct_device_minute_device_id"
+   ],
+   "name": "not_null_fct_device_minute_device_id",
+   "refs": [
+    {
+     "name": "fct_device_minute",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "device_id",
+     "model": "{{ get_where_subquery(ref('fct_device_minute')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_fct_device_minute_device_id.b97152ee26"
+  },
+  "test.telemetry.not_null_fct_device_minute_device_key.5cbc2e5d57": {
+   "attached_node": "model.telemetry.fct_device_minute",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "not_null_fct_device_minute_device_key"
+   ],
+   "name": "not_null_fct_device_minute_device_key",
+   "refs": [
+    {
+     "name": "fct_device_minute",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "device_key",
+     "model": "{{ get_where_subquery(ref('fct_device_minute')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_fct_device_minute_device_key.5cbc2e5d57"
+  },
+  "test.telemetry.not_null_fct_device_minute_device_minute_id.5146648605": {
+   "attached_node": "model.telemetry.fct_device_minute",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "not_null_fct_device_minute_device_minute_id"
+   ],
+   "name": "not_null_fct_device_minute_device_minute_id",
+   "refs": [
+    {
+     "name": "fct_device_minute",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "device_minute_id",
+     "model": "{{ get_where_subquery(ref('fct_device_minute')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_fct_device_minute_device_minute_id.5146648605"
+  },
+  "test.telemetry.not_null_fct_device_minute_minute_ts.0daccc267c": {
+   "attached_node": "model.telemetry.fct_device_minute",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "not_null_fct_device_minute_minute_ts"
+   ],
+   "name": "not_null_fct_device_minute_minute_ts",
+   "refs": [
+    {
+     "name": "fct_device_minute",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "minute_ts",
+     "model": "{{ get_where_subquery(ref('fct_device_minute')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_fct_device_minute_minute_ts.0daccc267c"
+  },
+  "test.telemetry.not_null_fct_firmware_daily_firmware_version.337d56a083": {
+   "attached_node": "model.telemetry.fct_firmware_daily",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "not_null_fct_firmware_daily_firmware_version"
+   ],
+   "name": "not_null_fct_firmware_daily_firmware_version",
+   "refs": [
+    {
+     "name": "fct_firmware_daily",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "firmware_version",
+     "model": "{{ get_where_subquery(ref('fct_firmware_daily')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_fct_firmware_daily_firmware_version.337d56a083"
+  },
+  "test.telemetry.not_null_fct_firmware_daily_hardware_model.365746dff1": {
+   "attached_node": "model.telemetry.fct_firmware_daily",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "not_null_fct_firmware_daily_hardware_model"
+   ],
+   "name": "not_null_fct_firmware_daily_hardware_model",
+   "refs": [
+    {
+     "name": "fct_firmware_daily",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "hardware_model",
+     "model": "{{ get_where_subquery(ref('fct_firmware_daily')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_fct_firmware_daily_hardware_model.365746dff1"
+  },
+  "test.telemetry.not_null_fct_trip_device_key.cd2054fd38": {
+   "attached_node": "model.telemetry.fct_trip",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "not_null_fct_trip_device_key"
+   ],
+   "name": "not_null_fct_trip_device_key",
+   "refs": [
+    {
+     "name": "fct_trip",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "device_key",
+     "model": "{{ get_where_subquery(ref('fct_trip')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_fct_trip_device_key.cd2054fd38"
+  },
+  "test.telemetry.not_null_fct_trip_trip_id.ef36f9ea0c": {
+   "attached_node": "model.telemetry.fct_trip",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "not_null_fct_trip_trip_id"
+   ],
+   "name": "not_null_fct_trip_trip_id",
+   "refs": [
+    {
+     "name": "fct_trip",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "trip_id",
+     "model": "{{ get_where_subquery(ref('fct_trip')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_fct_trip_trip_id.ef36f9ea0c"
+  },
+  "test.telemetry.not_null_stg_device_event_event_id.d5bc444c4c": {
+   "attached_node": "model.telemetry.stg_device_event",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "not_null_stg_device_event_event_id"
+   ],
+   "name": "not_null_stg_device_event_event_id",
+   "refs": [
+    {
+     "name": "stg_device_event",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_id",
+     "model": "{{ get_where_subquery(ref('stg_device_event')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_stg_device_event_event_id.d5bc444c4c"
+  },
+  "test.telemetry.not_null_stg_firmware_releases_firmware_version.e03945e0f4": {
+   "attached_node": "model.telemetry.stg_firmware_releases",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "not_null_stg_firmware_releases_firmware_version"
+   ],
+   "name": "not_null_stg_firmware_releases_firmware_version",
+   "refs": [
+    {
+     "name": "stg_firmware_releases",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "firmware_version",
+     "model": "{{ get_where_subquery(ref('stg_firmware_releases')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_stg_firmware_releases_firmware_version.e03945e0f4"
+  },
+  "test.telemetry.not_null_stg_fleet_registry_device_id.e2f16e27ce": {
+   "attached_node": "model.telemetry.stg_fleet_registry",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "not_null_stg_fleet_registry_device_id"
+   ],
+   "name": "not_null_stg_fleet_registry_device_id",
+   "refs": [
+    {
+     "name": "stg_fleet_registry",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "device_id",
+     "model": "{{ get_where_subquery(ref('stg_fleet_registry')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_stg_fleet_registry_device_id.e2f16e27ce"
+  },
+  "test.telemetry.not_null_stg_gps_event_id.befc851f05": {
+   "attached_node": "model.telemetry.stg_gps",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "not_null_stg_gps_event_id"
+   ],
+   "name": "not_null_stg_gps_event_id",
+   "refs": [
+    {
+     "name": "stg_gps",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_id",
+     "model": "{{ get_where_subquery(ref('stg_gps')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_stg_gps_event_id.befc851f05"
+  },
+  "test.telemetry.not_null_stg_heartbeat_event_id.b6f39d2f57": {
+   "attached_node": "model.telemetry.stg_heartbeat",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "not_null_stg_heartbeat_event_id"
+   ],
+   "name": "not_null_stg_heartbeat_event_id",
+   "refs": [
+    {
+     "name": "stg_heartbeat",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_id",
+     "model": "{{ get_where_subquery(ref('stg_heartbeat')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_stg_heartbeat_event_id.b6f39d2f57"
+  },
+  "test.telemetry.not_null_stg_lte_event_id.05d2076296": {
+   "attached_node": "model.telemetry.stg_lte",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "not_null_stg_lte_event_id"
+   ],
+   "name": "not_null_stg_lte_event_id",
+   "refs": [
+    {
+     "name": "stg_lte",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_id",
+     "model": "{{ get_where_subquery(ref('stg_lte')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_stg_lte_event_id.05d2076296"
+  },
+  "test.telemetry.not_null_stg_trip_trip_id.4a9f752229": {
+   "attached_node": "model.telemetry.stg_trip",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "not_null_stg_trip_trip_id"
+   ],
+   "name": "not_null_stg_trip_trip_id",
+   "refs": [
+    {
+     "name": "stg_trip",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "trip_id",
+     "model": "{{ get_where_subquery(ref('stg_trip')) }}"
+    },
+    "name": "not_null",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.not_null_stg_trip_trip_id.4a9f752229"
+  },
+  "test.telemetry.relationships_dim_device_device_id__device_id__ref_stg_fleet_registry_.f6b2a3c4a0": {
+   "attached_node": "model.telemetry.dim_device",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "relationships_dim_device_device_id__device_id__ref_stg_fleet_registry_"
+   ],
+   "name": "relationships_dim_device_device_id__device_id__ref_stg_fleet_registry_",
+   "refs": [
+    {
+     "name": "stg_fleet_registry",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "dim_device",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "device_id",
+     "field": "device_id",
+     "model": "{{ get_where_subquery(ref('dim_device')) }}",
+     "to": "ref('stg_fleet_registry')"
+    },
+    "name": "relationships",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.relationships_dim_device_device_id__device_id__ref_stg_fleet_registry_.f6b2a3c4a0"
+  },
+  "test.telemetry.relationships_dim_device_firmware_version__firmware_version__ref_dim_firmware_.f85365b385": {
+   "attached_node": "model.telemetry.dim_device",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "relationships_dim_device_firmware_version__firmware_version__ref_dim_firmware_"
+   ],
+   "name": "relationships_dim_device_firmware_version__firmware_version__ref_dim_firmware_",
+   "refs": [
+    {
+     "name": "dim_firmware",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "dim_device",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "firmware_version",
+     "field": "firmware_version",
+     "model": "{{ get_where_subquery(ref('dim_device')) }}",
+     "to": "ref('dim_firmware')"
+    },
+    "name": "relationships",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.relationships_dim_device_firmware_version__firmware_version__ref_dim_firmware_.f85365b385"
+  },
+  "test.telemetry.relationships_dim_device_region_id__region_id__ref_dim_region_.af49bc19ff": {
+   "attached_node": "model.telemetry.dim_device",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "relationships_dim_device_region_id__region_id__ref_dim_region_"
+   ],
+   "name": "relationships_dim_device_region_id__region_id__ref_dim_region_",
+   "refs": [
+    {
+     "name": "dim_region",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "dim_device",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "region_id",
+     "field": "region_id",
+     "model": "{{ get_where_subquery(ref('dim_device')) }}",
+     "to": "ref('dim_region')"
+    },
+    "name": "relationships",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.relationships_dim_device_region_id__region_id__ref_dim_region_.af49bc19ff"
+  },
+  "test.telemetry.relationships_fct_device_daily_device_id__device_id__ref_stg_fleet_registry_.59087c395e": {
+   "attached_node": "model.telemetry.fct_device_daily",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "relationships_fct_device_daily_device_id__device_id__ref_stg_fleet_registry_"
+   ],
+   "name": "relationships_fct_device_daily_device_id__device_id__ref_stg_fleet_registry_",
+   "refs": [
+    {
+     "name": "stg_fleet_registry",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "fct_device_daily",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "device_id",
+     "field": "device_id",
+     "model": "{{ get_where_subquery(ref('fct_device_daily')) }}",
+     "to": "ref('stg_fleet_registry')"
+    },
+    "name": "relationships",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.relationships_fct_device_daily_device_id__device_id__ref_stg_fleet_registry_.59087c395e"
+  },
+  "test.telemetry.relationships_fct_device_daily_device_key__device_key__ref_dim_device_.ba17dd3286": {
+   "attached_node": "model.telemetry.fct_device_daily",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "relationships_fct_device_daily_device_key__device_key__ref_dim_device_"
+   ],
+   "name": "relationships_fct_device_daily_device_key__device_key__ref_dim_device_",
+   "refs": [
+    {
+     "name": "dim_device",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "fct_device_daily",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "device_key",
+     "field": "device_key",
+     "model": "{{ get_where_subquery(ref('fct_device_daily')) }}",
+     "to": "ref('dim_device')"
+    },
+    "name": "relationships",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.relationships_fct_device_daily_device_key__device_key__ref_dim_device_.ba17dd3286"
+  },
+  "test.telemetry.relationships_fct_device_daily_event_date__date_day__ref_dim_date_.1b5816cace": {
+   "attached_node": "model.telemetry.fct_device_daily",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "relationships_fct_device_daily_event_date__date_day__ref_dim_date_"
+   ],
+   "name": "relationships_fct_device_daily_event_date__date_day__ref_dim_date_",
+   "refs": [
+    {
+     "name": "dim_date",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "fct_device_daily",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_date",
+     "field": "date_day",
+     "model": "{{ get_where_subquery(ref('fct_device_daily')) }}",
+     "to": "ref('dim_date')"
+    },
+    "name": "relationships",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.relationships_fct_device_daily_event_date__date_day__ref_dim_date_.1b5816cace"
+  },
+  "test.telemetry.relationships_fct_device_event_device_key__device_key__ref_dim_device_.010fee7570": {
+   "attached_node": "model.telemetry.fct_device_event",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "relationships_fct_device_event_device_key__device_key__ref_dim_device_"
+   ],
+   "name": "relationships_fct_device_event_device_key__device_key__ref_dim_device_",
+   "refs": [
+    {
+     "name": "dim_device",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "fct_device_event",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "device_key",
+     "field": "device_key",
+     "model": "{{ get_where_subquery(ref('fct_device_event')) }}",
+     "to": "ref('dim_device')"
+    },
+    "name": "relationships",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.relationships_fct_device_event_device_key__device_key__ref_dim_device_.010fee7570"
+  },
+  "test.telemetry.relationships_fct_device_event_event_code__event_code__ref_dim_event_code_.e42a9f0bce": {
+   "attached_node": "model.telemetry.fct_device_event",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "relationships_fct_device_event_event_code__event_code__ref_dim_event_code_"
+   ],
+   "name": "relationships_fct_device_event_event_code__event_code__ref_dim_event_code_",
+   "refs": [
+    {
+     "name": "dim_event_code",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "fct_device_event",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_code",
+     "field": "event_code",
+     "model": "{{ get_where_subquery(ref('fct_device_event')) }}",
+     "to": "ref('dim_event_code')"
+    },
+    "name": "relationships",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.relationships_fct_device_event_event_code__event_code__ref_dim_event_code_.e42a9f0bce"
+  },
+  "test.telemetry.relationships_fct_device_event_event_date__date_day__ref_dim_date_.b88ad4053f": {
+   "attached_node": "model.telemetry.fct_device_event",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "relationships_fct_device_event_event_date__date_day__ref_dim_date_"
+   ],
+   "name": "relationships_fct_device_event_event_date__date_day__ref_dim_date_",
+   "refs": [
+    {
+     "name": "dim_date",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "fct_device_event",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_date",
+     "field": "date_day",
+     "model": "{{ get_where_subquery(ref('fct_device_event')) }}",
+     "to": "ref('dim_date')"
+    },
+    "name": "relationships",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.relationships_fct_device_event_event_date__date_day__ref_dim_date_.b88ad4053f"
+  },
+  "test.telemetry.relationships_fct_device_event_firmware_version__firmware_version__ref_dim_firmware_.adb2667dce": {
+   "attached_node": "model.telemetry.fct_device_event",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "relationships_fct_device_event_firmware_version__firmware_version__ref_dim_firmware_"
+   ],
+   "name": "relationships_fct_device_event_firmware_version__firmware_version__ref_dim_firmware_",
+   "refs": [
+    {
+     "name": "dim_firmware",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "fct_device_event",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "firmware_version",
+     "field": "firmware_version",
+     "model": "{{ get_where_subquery(ref('fct_device_event')) }}",
+     "to": "ref('dim_firmware')"
+    },
+    "name": "relationships",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.relationships_fct_device_event_firmware_version__firmware_version__ref_dim_firmware_.adb2667dce"
+  },
+  "test.telemetry.relationships_fct_device_minute_device_key__device_key__ref_dim_device_.87f9e0fe70": {
+   "attached_node": "model.telemetry.fct_device_minute",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "relationships_fct_device_minute_device_key__device_key__ref_dim_device_"
+   ],
+   "name": "relationships_fct_device_minute_device_key__device_key__ref_dim_device_",
+   "refs": [
+    {
+     "name": "dim_device",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "fct_device_minute",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "device_key",
+     "field": "device_key",
+     "model": "{{ get_where_subquery(ref('fct_device_minute')) }}",
+     "to": "ref('dim_device')"
+    },
+    "name": "relationships",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.relationships_fct_device_minute_device_key__device_key__ref_dim_device_.87f9e0fe70"
+  },
+  "test.telemetry.relationships_fct_device_minute_event_date__date_day__ref_dim_date_.8203051cb7": {
+   "attached_node": "model.telemetry.fct_device_minute",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "relationships_fct_device_minute_event_date__date_day__ref_dim_date_"
+   ],
+   "name": "relationships_fct_device_minute_event_date__date_day__ref_dim_date_",
+   "refs": [
+    {
+     "name": "dim_date",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "fct_device_minute",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_date",
+     "field": "date_day",
+     "model": "{{ get_where_subquery(ref('fct_device_minute')) }}",
+     "to": "ref('dim_date')"
+    },
+    "name": "relationships",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.relationships_fct_device_minute_event_date__date_day__ref_dim_date_.8203051cb7"
+  },
+  "test.telemetry.relationships_fct_device_minute_firmware_version__firmware_version__ref_dim_firmware_.710362454f": {
+   "attached_node": "model.telemetry.fct_device_minute",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "relationships_fct_device_minute_firmware_version__firmware_version__ref_dim_firmware_"
+   ],
+   "name": "relationships_fct_device_minute_firmware_version__firmware_version__ref_dim_firmware_",
+   "refs": [
+    {
+     "name": "dim_firmware",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "fct_device_minute",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "firmware_version",
+     "field": "firmware_version",
+     "model": "{{ get_where_subquery(ref('fct_device_minute')) }}",
+     "to": "ref('dim_firmware')"
+    },
+    "name": "relationships",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.relationships_fct_device_minute_firmware_version__firmware_version__ref_dim_firmware_.710362454f"
+  },
+  "test.telemetry.relationships_fct_firmware_daily_event_date__date_day__ref_dim_date_.49067bf22f": {
+   "attached_node": "model.telemetry.fct_firmware_daily",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "relationships_fct_firmware_daily_event_date__date_day__ref_dim_date_"
+   ],
+   "name": "relationships_fct_firmware_daily_event_date__date_day__ref_dim_date_",
+   "refs": [
+    {
+     "name": "dim_date",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "fct_firmware_daily",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_date",
+     "field": "date_day",
+     "model": "{{ get_where_subquery(ref('fct_firmware_daily')) }}",
+     "to": "ref('dim_date')"
+    },
+    "name": "relationships",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.relationships_fct_firmware_daily_event_date__date_day__ref_dim_date_.49067bf22f"
+  },
+  "test.telemetry.relationships_fct_firmware_daily_firmware_version__firmware_version__ref_dim_firmware_.148a8cb4cc": {
+   "attached_node": "model.telemetry.fct_firmware_daily",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "relationships_fct_firmware_daily_firmware_version__firmware_version__ref_dim_firmware_"
+   ],
+   "name": "relationships_fct_firmware_daily_firmware_version__firmware_version__ref_dim_firmware_",
+   "refs": [
+    {
+     "name": "dim_firmware",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "fct_firmware_daily",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "firmware_version",
+     "field": "firmware_version",
+     "model": "{{ get_where_subquery(ref('fct_firmware_daily')) }}",
+     "to": "ref('dim_firmware')"
+    },
+    "name": "relationships",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.relationships_fct_firmware_daily_firmware_version__firmware_version__ref_dim_firmware_.148a8cb4cc"
+  },
+  "test.telemetry.relationships_fct_trip_device_key__device_key__ref_dim_device_.14ce8b093b": {
+   "attached_node": "model.telemetry.fct_trip",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "relationships_fct_trip_device_key__device_key__ref_dim_device_"
+   ],
+   "name": "relationships_fct_trip_device_key__device_key__ref_dim_device_",
+   "refs": [
+    {
+     "name": "dim_device",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "fct_trip",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "device_key",
+     "field": "device_key",
+     "model": "{{ get_where_subquery(ref('fct_trip')) }}",
+     "to": "ref('dim_device')"
+    },
+    "name": "relationships",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.relationships_fct_trip_device_key__device_key__ref_dim_device_.14ce8b093b"
+  },
+  "test.telemetry.relationships_fct_trip_trip_date__date_day__ref_dim_date_.e2f932a8da": {
+   "attached_node": "model.telemetry.fct_trip",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "relationships_fct_trip_trip_date__date_day__ref_dim_date_"
+   ],
+   "name": "relationships_fct_trip_trip_date__date_day__ref_dim_date_",
+   "refs": [
+    {
+     "name": "dim_date",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "fct_trip",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "trip_date",
+     "field": "date_day",
+     "model": "{{ get_where_subquery(ref('fct_trip')) }}",
+     "to": "ref('dim_date')"
+    },
+    "name": "relationships",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.relationships_fct_trip_trip_date__date_day__ref_dim_date_.e2f932a8da"
+  },
+  "test.telemetry.unique_dim_date_date_day.d56fd19199": {
+   "attached_node": "model.telemetry.dim_date",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "unique_dim_date_date_day"
+   ],
+   "name": "unique_dim_date_date_day",
+   "refs": [
+    {
+     "name": "dim_date",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "date_day",
+     "model": "{{ get_where_subquery(ref('dim_date')) }}"
+    },
+    "name": "unique",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.unique_dim_date_date_day.d56fd19199"
+  },
+  "test.telemetry.unique_dim_device_device_key.30a77f094b": {
+   "attached_node": "model.telemetry.dim_device",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "unique_dim_device_device_key"
+   ],
+   "name": "unique_dim_device_device_key",
+   "refs": [
+    {
+     "name": "dim_device",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "device_key",
+     "model": "{{ get_where_subquery(ref('dim_device')) }}"
+    },
+    "name": "unique",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.unique_dim_device_device_key.30a77f094b"
+  },
+  "test.telemetry.unique_dim_device_snapshot_dbt_scd_id.bfb140d9b3": {
+   "attached_node": "snapshot.telemetry.dim_device_snapshot",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "unique_dim_device_snapshot_dbt_scd_id"
+   ],
+   "name": "unique_dim_device_snapshot_dbt_scd_id",
+   "refs": [
+    {
+     "name": "dim_device_snapshot",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "dbt_scd_id",
+     "model": "{{ get_where_subquery(ref('dim_device_snapshot')) }}"
+    },
+    "name": "unique",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.unique_dim_device_snapshot_dbt_scd_id.bfb140d9b3"
+  },
+  "test.telemetry.unique_dim_event_code_event_code.ad00062ca4": {
+   "attached_node": "seed.telemetry.dim_event_code",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "unique_dim_event_code_event_code"
+   ],
+   "name": "unique_dim_event_code_event_code",
+   "refs": [
+    {
+     "name": "dim_event_code",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_code",
+     "model": "{{ get_where_subquery(ref('dim_event_code')) }}"
+    },
+    "name": "unique",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.unique_dim_event_code_event_code.ad00062ca4"
+  },
+  "test.telemetry.unique_dim_firmware_firmware_version.883e8ddbc6": {
+   "attached_node": "model.telemetry.dim_firmware",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "unique_dim_firmware_firmware_version"
+   ],
+   "name": "unique_dim_firmware_firmware_version",
+   "refs": [
+    {
+     "name": "dim_firmware",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "firmware_version",
+     "model": "{{ get_where_subquery(ref('dim_firmware')) }}"
+    },
+    "name": "unique",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.unique_dim_firmware_firmware_version.883e8ddbc6"
+  },
+  "test.telemetry.unique_dim_region_region_id.efd4605961": {
+   "attached_node": "seed.telemetry.dim_region",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "unique_dim_region_region_id"
+   ],
+   "name": "unique_dim_region_region_id",
+   "refs": [
+    {
+     "name": "dim_region",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "region_id",
+     "model": "{{ get_where_subquery(ref('dim_region')) }}"
+    },
+    "name": "unique",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.unique_dim_region_region_id.efd4605961"
+  },
+  "test.telemetry.unique_fct_device_event_event_id.9d66256b4e": {
+   "attached_node": "model.telemetry.fct_device_event",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "unique_fct_device_event_event_id"
+   ],
+   "name": "unique_fct_device_event_event_id",
+   "refs": [
+    {
+     "name": "fct_device_event",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_id",
+     "model": "{{ get_where_subquery(ref('fct_device_event')) }}"
+    },
+    "name": "unique",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.unique_fct_device_event_event_id.9d66256b4e"
+  },
+  "test.telemetry.unique_fct_device_minute_device_minute_id.f44f37a3dd": {
+   "attached_node": "model.telemetry.fct_device_minute",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "unique_fct_device_minute_device_minute_id"
+   ],
+   "name": "unique_fct_device_minute_device_minute_id",
+   "refs": [
+    {
+     "name": "fct_device_minute",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "device_minute_id",
+     "model": "{{ get_where_subquery(ref('fct_device_minute')) }}"
+    },
+    "name": "unique",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.unique_fct_device_minute_device_minute_id.f44f37a3dd"
+  },
+  "test.telemetry.unique_fct_trip_trip_id.54568f3abe": {
+   "attached_node": "model.telemetry.fct_trip",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "marts",
+    "unique_fct_trip_trip_id"
+   ],
+   "name": "unique_fct_trip_trip_id",
+   "refs": [
+    {
+     "name": "fct_trip",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "trip_id",
+     "model": "{{ get_where_subquery(ref('fct_trip')) }}"
+    },
+    "name": "unique",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.unique_fct_trip_trip_id.54568f3abe"
+  },
+  "test.telemetry.unique_stg_device_event_event_id.f78c57d544": {
+   "attached_node": "model.telemetry.stg_device_event",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "unique_stg_device_event_event_id"
+   ],
+   "name": "unique_stg_device_event_event_id",
+   "refs": [
+    {
+     "name": "stg_device_event",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_id",
+     "model": "{{ get_where_subquery(ref('stg_device_event')) }}"
+    },
+    "name": "unique",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.unique_stg_device_event_event_id.f78c57d544"
+  },
+  "test.telemetry.unique_stg_firmware_releases_firmware_version.faa306a79b": {
+   "attached_node": "model.telemetry.stg_firmware_releases",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "unique_stg_firmware_releases_firmware_version"
+   ],
+   "name": "unique_stg_firmware_releases_firmware_version",
+   "refs": [
+    {
+     "name": "stg_firmware_releases",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "firmware_version",
+     "model": "{{ get_where_subquery(ref('stg_firmware_releases')) }}"
+    },
+    "name": "unique",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.unique_stg_firmware_releases_firmware_version.faa306a79b"
+  },
+  "test.telemetry.unique_stg_fleet_registry_device_id.e7fb62b74c": {
+   "attached_node": "model.telemetry.stg_fleet_registry",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "unique_stg_fleet_registry_device_id"
+   ],
+   "name": "unique_stg_fleet_registry_device_id",
+   "refs": [
+    {
+     "name": "stg_fleet_registry",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "device_id",
+     "model": "{{ get_where_subquery(ref('stg_fleet_registry')) }}"
+    },
+    "name": "unique",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.unique_stg_fleet_registry_device_id.e7fb62b74c"
+  },
+  "test.telemetry.unique_stg_gps_event_id.675d531bb5": {
+   "attached_node": "model.telemetry.stg_gps",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "unique_stg_gps_event_id"
+   ],
+   "name": "unique_stg_gps_event_id",
+   "refs": [
+    {
+     "name": "stg_gps",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_id",
+     "model": "{{ get_where_subquery(ref('stg_gps')) }}"
+    },
+    "name": "unique",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.unique_stg_gps_event_id.675d531bb5"
+  },
+  "test.telemetry.unique_stg_heartbeat_event_id.5819564921": {
+   "attached_node": "model.telemetry.stg_heartbeat",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "unique_stg_heartbeat_event_id"
+   ],
+   "name": "unique_stg_heartbeat_event_id",
+   "refs": [
+    {
+     "name": "stg_heartbeat",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_id",
+     "model": "{{ get_where_subquery(ref('stg_heartbeat')) }}"
+    },
+    "name": "unique",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.unique_stg_heartbeat_event_id.5819564921"
+  },
+  "test.telemetry.unique_stg_lte_event_id.5b375c0cd7": {
+   "attached_node": "model.telemetry.stg_lte",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "unique_stg_lte_event_id"
+   ],
+   "name": "unique_stg_lte_event_id",
+   "refs": [
+    {
+     "name": "stg_lte",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "event_id",
+     "model": "{{ get_where_subquery(ref('stg_lte')) }}"
+    },
+    "name": "unique",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.unique_stg_lte_event_id.5b375c0cd7"
+  },
+  "test.telemetry.unique_stg_trip_trip_id.ed3fd31a0e": {
+   "attached_node": "model.telemetry.stg_trip",
+   "columns": {},
+   "description": "",
+   "fqn": [
+    "telemetry",
+    "staging",
+    "unique_stg_trip_trip_id"
+   ],
+   "name": "unique_stg_trip_trip_id",
+   "refs": [
+    {
+     "name": "stg_trip",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "test",
+   "schema": "dbt_test__audit",
+   "test_metadata": {
+    "kwargs": {
+     "column_name": "trip_id",
+     "model": "{{ get_where_subquery(ref('stg_trip')) }}"
+    },
+    "name": "unique",
+    "namespace": null
+   },
+   "unique_id": "test.telemetry.unique_stg_trip_trip_id.ed3fd31a0e"
+  }
+ }
+}

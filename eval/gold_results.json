@@ -1,0 +1,910 @@
+{
+ "warehouse": "platform",
+ "results": {
+  "e01": {
+   "columns": [
+    "count(DISTINCT device_id)"
+   ],
+   "row_count": 1,
+   "rows": [
+    [
+     500
+    ]
+   ],
+   "sha256_16": "6729ad82d01147ca"
+  },
+  "e02": {
+   "columns": [
+    "count(DISTINCT device_id)"
+   ],
+   "row_count": 1,
+   "rows": [
+    [
+     100
+    ]
+   ],
+   "sha256_16": "fc76760fde696517"
+  },
+  "e03": {
+   "columns": [
+    "hardware_model",
+    "devices"
+   ],
+   "row_count": 3,
+   "rows": [
+    [
+     "TX-100",
+     228
+    ],
+    [
+     "TX-300",
+     106
+    ],
+    [
+     "TX-200",
+     166
+    ]
+   ],
+   "sha256_16": "e72acc67c703ec42"
+  },
+  "e04": {
+   "columns": [
+    "firmware_version",
+    "release_date"
+   ],
+   "row_count": 1,
+   "rows": [
+    [
+     "1.1.0",
+     "2026-01-02"
+    ]
+   ],
+   "sha256_16": "aa02c2c51b8cab7a"
+  },
+  "e05": {
+   "columns": [
+    "count_star()"
+   ],
+   "row_count": 1,
+   "rows": [
+    [
+     167
+    ]
+   ],
+   "sha256_16": "37956bc35581d800"
+  },
+  "e06": {
+   "columns": [
+    "count_star()"
+   ],
+   "row_count": 1,
+   "rows": [
+    [
+     1357
+    ]
+   ],
+   "sha256_16": "0b363de2dea3a4b0"
+  },
+  "e07": {
+   "columns": [
+    "avg(distance_km)"
+   ],
+   "row_count": 1,
+   "rows": [
+    [
+     27.600458373307625
+    ]
+   ],
+   "sha256_16": "79a87d771deca5ba"
+  },
+  "e08": {
+   "columns": [
+    "event_code"
+   ],
+   "row_count": 1,
+   "rows": [
+    [
+     "OVERHEAT"
+    ]
+   ],
+   "sha256_16": "1073243f6c731073"
+  },
+  "e09": {
+   "columns": [
+    "max(temp_c)"
+   ],
+   "row_count": 1,
+   "rows": [
+    [
+     95.9
+    ]
+   ],
+   "sha256_16": "11aa1119df7f562e"
+  },
+  "e10": {
+   "columns": [
+    "event_code",
+    "events"
+   ],
+   "row_count": 5,
+   "rows": [
+    [
+     "CAM_CRASH",
+     30
+    ],
+    [
+     "LOW_MEMORY",
+     28
+    ],
+    [
+     "OVERHEAT",
+     21
+    ],
+    [
+     "FW_UPDATE",
+     99
+    ],
+    [
+     "REBOOT",
+     19
+    ]
+   ],
+   "sha256_16": "3a463397ae8bc700"
+  },
+  "e11": {
+   "columns": [
+    "drive_minutes"
+   ],
+   "row_count": 1,
+   "rows": [
+    [
+     72
+    ]
+   ],
+   "sha256_16": "7d1402d3c10eaae5"
+  },
+  "e12": {
+   "columns": [
+    "timezone"
+   ],
+   "row_count": 1,
+   "rows": [
+    [
+     "Asia/Kolkata"
+    ]
+   ],
+   "sha256_16": "d4f3c0e81abf6c73"
+  },
+  "e13": {
+   "columns": [
+    "count(DISTINCT device_id)"
+   ],
+   "row_count": 1,
+   "rows": [
+    [
+     45
+    ]
+   ],
+   "sha256_16": "cc01c9dd5f03fc94"
+  },
+  "e14": {
+   "columns": [
+    "count_star()"
+   ],
+   "row_count": 1,
+   "rows": [
+    [
+     180
+    ]
+   ],
+   "sha256_16": "fd6e4a458511854f"
+  },
+  "e15": {
+   "columns": [
+    "count(DISTINCT device_id)"
+   ],
+   "row_count": 1,
+   "rows": [
+    [
+     403
+    ]
+   ],
+   "sha256_16": "cc0fef69370364bb"
+  },
+  "m01": {
+   "columns": [
+    "firmware_version",
+    "crash_rate"
+   ],
+   "row_count": 2,
+   "rows": [
+    [
+     "1.0.0",
+     4.24
+    ],
+    [
+     "1.1.0",
+     5.92
+    ]
+   ],
+   "sha256_16": "b70f5ab10b712814"
+  },
+  "m02": {
+   "columns": [
+    "hardware_model",
+    "firmware_version",
+    "crash_rate"
+   ],
+   "row_count": 6,
+   "rows": [
+    [
+     "TX-100",
+     "1.1.0",
+     4.87
+    ],
+    [
+     "TX-100",
+     "1.0.0",
+     4.78
+    ],
+    [
+     "TX-300",
+     "1.0.0",
+     4.95
+    ],
+    [
+     "TX-300",
+     "1.1.0",
+     4.31
+    ],
+    [
+     "TX-200",
+     "1.0.0",
+     3.09
+    ],
+    [
+     "TX-200",
+     "1.1.0",
+     8.42
+    ]
+   ],
+   "sha256_16": "b30d4fdbe76d61f2"
+  },
+  "m03": {
+   "columns": [
+    "region_id",
+    "avg_lte_loss_pct"
+   ],
+   "row_count": 5,
+   "rows": [
+    [
+     "us-west",
+     7.78
+    ],
+    [
+     "in-west",
+     2.77
+    ],
+    [
+     "eu-central",
+     3.08
+    ],
+    [
+     "ap-southeast",
+     2.91
+    ],
+    [
+     "us-east",
+     1.57
+    ]
+   ],
+   "sha256_16": "a0c04c563860066a"
+  },
+  "m04": {
+   "columns": [
+    "device_id",
+    "total_km"
+   ],
+   "row_count": 5,
+   "rows": [
+    [
+     "dev-000384",
+     913.4000000000003
+    ],
+    [
+     "dev-000152",
+     866.4000000000002
+    ],
+    [
+     "dev-000020",
+     855.6999999999999
+    ],
+    [
+     "dev-000275",
+     851.3000000000001
+    ],
+    [
+     "dev-000110",
+     837.9000000000001
+    ]
+   ],
+   "sha256_16": "cfb815bf84923f4a"
+  },
+  "m05": {
+   "columns": [
+    "is_weekend",
+    "trips"
+   ],
+   "row_count": 2,
+   "rows": [
+    [
+     true,
+     2725
+    ],
+    [
+     false,
+     6795
+    ]
+   ],
+   "sha256_16": "7301d914c2c2135d"
+  },
+  "m06": {
+   "columns": [
+    "event_date",
+    "crashes"
+   ],
+   "row_count": 7,
+   "rows": [
+    [
+     "2026-01-01",
+     7
+    ],
+    [
+     "2026-01-02",
+     5
+    ],
+    [
+     "2026-01-03",
+     6
+    ],
+    [
+     "2026-01-04",
+     4
+    ],
+    [
+     "2026-01-05",
+     12
+    ],
+    [
+     "2026-01-06",
+     11
+    ],
+    [
+     "2026-01-07",
+     12
+    ]
+   ],
+   "sha256_16": "ba6e6f37d119639d"
+  },
+  "m07": {
+   "columns": [
+    "region_id",
+    "devices"
+   ],
+   "row_count": 5,
+   "rows": [
+    [
+     "eu-central",
+     27
+    ],
+    [
+     "us-west",
+     29
+    ],
+    [
+     "in-west",
+     29
+    ],
+    [
+     "ap-southeast",
+     31
+    ],
+    [
+     "us-east",
+     33
+    ]
+   ],
+   "sha256_16": "552c24ad281400d3"
+  },
+  "m08": {
+   "columns": [
+    "hardware_model",
+    "avg_duration_min"
+   ],
+   "row_count": 3,
+   "rows": [
+    [
+     "TX-100",
+     33.03511666273863
+    ],
+    [
+     "TX-300",
+     32.25834175935288
+    ],
+    [
+     "TX-200",
+     32.617721518987345
+    ]
+   ],
+   "sha256_16": "12bfec23e206844e"
+  },
+  "m09": {
+   "columns": [
+    "day",
+    "devices"
+   ],
+   "row_count": 1,
+   "rows": [
+    [
+     "2026-01-06",
+     105
+    ]
+   ],
+   "sha256_16": "e079e0bcbcffc8df"
+  },
+  "m10": {
+   "columns": [
+    "region_id",
+    "drive_hours"
+   ],
+   "row_count": 5,
+   "rows": [
+    [
+     "us-east",
+     143.55
+    ],
+    [
+     "ap-southeast",
+     129.71666666666667
+    ],
+    [
+     "eu-central",
+     152.98333333333332
+    ],
+    [
+     "in-west",
+     136.8
+    ],
+    [
+     "us-west",
+     153.58333333333334
+    ]
+   ],
+   "sha256_16": "0405e670fcbc6598"
+  },
+  "m11": {
+   "columns": [
+    "hardware_model",
+    "avg_temp_c"
+   ],
+   "row_count": 1,
+   "rows": [
+    [
+     "TX-200",
+     50.558845829014395
+    ]
+   ],
+   "sha256_16": "8a54dba96ca5f0da"
+  },
+  "m12": {
+   "columns": [
+    "count_star()"
+   ],
+   "row_count": 1,
+   "rows": [
+    [
+     175
+    ]
+   ],
+   "sha256_16": "7c32fced0537610b"
+  },
+  "m13": {
+   "columns": [
+    "hardware_model",
+    "avg_gps_valid_pct"
+   ],
+   "row_count": 3,
+   "rows": [
+    [
+     "TX-300",
+     96.85
+    ],
+    [
+     "TX-100",
+     96.99
+    ],
+    [
+     "TX-200",
+     97.02
+    ]
+   ],
+   "sha256_16": "78ce7fc203a7b4fd"
+  },
+  "m14": {
+   "columns": [
+    "firmware_version",
+    "reboots"
+   ],
+   "row_count": 2,
+   "rows": [
+    [
+     "1.0.0",
+     57
+    ],
+    [
+     "1.1.0",
+     41
+    ]
+   ],
+   "sha256_16": "6b51e03a1555e09d"
+  },
+  "m15": {
+   "columns": [
+    "category",
+    "events"
+   ],
+   "row_count": 5,
+   "rows": [
+    [
+     "thermal",
+     91
+    ],
+    [
+     "storage",
+     5
+    ],
+    [
+     "firmware",
+     402
+    ],
+    [
+     "system",
+     278
+    ],
+    [
+     "camera",
+     166
+    ]
+   ],
+   "sha256_16": "00693d7c06dea445"
+  },
+  "h01": {
+   "columns": [
+    "hardware_model",
+    "increase_pp"
+   ],
+   "row_count": 1,
+   "rows": [
+    [
+     "TX-300",
+     0.01873042611963971
+    ]
+   ],
+   "sha256_16": "934c02a8b821336a"
+  },
+  "h02": {
+   "columns": [
+    "firmware_version",
+    "crash_rate"
+   ],
+   "row_count": 2,
+   "rows": [
+    [
+     "1.0.0",
+     3.09
+    ],
+    [
+     "1.1.0",
+     8.42
+    ]
+   ],
+   "sha256_16": "be433373ff9ee7fc"
+  },
+  "h03": {
+   "columns": [
+    "firmware_version"
+   ],
+   "row_count": 1,
+   "rows": [
+    [
+     "1.0.0"
+    ]
+   ],
+   "sha256_16": "11b2d5bccd294048"
+  },
+  "h04": {
+   "columns": [
+    "count(DISTINCT device_id)"
+   ],
+   "row_count": 1,
+   "rows": [
+    [
+     84
+    ]
+   ],
+   "sha256_16": "3fb62ec5af237298"
+  },
+  "h05": {
+   "columns": [
+    "date_day",
+    "pct_on_1_1_0"
+   ],
+   "row_count": 7,
+   "rows": [
+    [
+     "2026-01-01",
+     0.0
+    ],
+    [
+     "2026-01-02",
+     1.2
+    ],
+    [
+     "2026-01-03",
+     16.8
+    ],
+    [
+     "2026-01-04",
+     33.0
+    ],
+    [
+     "2026-01-05",
+     52.8
+    ],
+    [
+     "2026-01-06",
+     73.8
+    ],
+    [
+     "2026-01-07",
+     80.4
+    ]
+   ],
+   "sha256_16": "35bf3f50064ec5c3"
+  },
+  "h06": {
+   "columns": [
+    "event_date",
+    "device_id",
+    "drive_minutes"
+   ],
+   "row_count": 7,
+   "rows": [
+    [
+     "2026-01-01",
+     "dev-000179",
+     346
+    ],
+    [
+     "2026-01-02",
+     "dev-000185",
+     290
+    ],
+    [
+     "2026-01-03",
+     "dev-000146",
+     293
+    ],
+    [
+     "2026-01-04",
+     "dev-000327",
+     278
+    ],
+    [
+     "2026-01-05",
+     "dev-000111",
+     358
+    ],
+    [
+     "2026-01-06",
+     "dev-000411",
+     285
+    ],
+    [
+     "2026-01-07",
+     "dev-000025",
+     306
+    ]
+   ],
+   "sha256_16": "04eeb27d1f615b9c"
+  },
+  "h07": {
+   "columns": [
+    "hardware_model",
+    "median_km"
+   ],
+   "row_count": 3,
+   "rows": [
+    [
+     "TX-200",
+     22.85
+    ],
+    [
+     "TX-100",
+     22.6
+    ],
+    [
+     "TX-300",
+     21.85
+    ]
+   ],
+   "sha256_16": "ee170df90ecdc3a7"
+  },
+  "h08": {
+   "columns": [
+    "hardware_model",
+    "p95_temp_c"
+   ],
+   "row_count": 3,
+   "rows": [
+    [
+     "TX-200",
+     59.2
+    ],
+    [
+     "TX-100",
+     59.0
+    ],
+    [
+     "TX-300",
+     58.9
+    ]
+   ],
+   "sha256_16": "caa517ed2a5c282e"
+  },
+  "h09": {
+   "columns": [
+    "event_date",
+    "change"
+   ],
+   "row_count": 6,
+   "rows": [
+    [
+     "2026-01-02",
+     1
+    ],
+    [
+     "2026-01-03",
+     0
+    ],
+    [
+     "2026-01-04",
+     1
+    ],
+    [
+     "2026-01-05",
+     8
+    ],
+    [
+     "2026-01-06",
+     -5
+    ],
+    [
+     "2026-01-07",
+     2
+    ]
+   ],
+   "sha256_16": "e9a7c3cee52c6dfa"
+  },
+  "h10": {
+   "columns": [
+    "firmware_version",
+    "avg_lte_loss_pct"
+   ],
+   "row_count": 2,
+   "rows": [
+    [
+     "1.0.0",
+     3.74
+    ],
+    [
+     "1.1.0",
+     3.33
+    ]
+   ],
+   "sha256_16": "70642095b4232abd"
+  },
+  "h11": {
+   "columns": [
+    "region_id",
+    "crash_rate"
+   ],
+   "row_count": 5,
+   "rows": [
+    [
+     "us-east",
+     5.46
+    ],
+    [
+     "ap-southeast",
+     5.27
+    ],
+    [
+     "in-west",
+     4.98
+    ],
+    [
+     "us-west",
+     4.97
+    ],
+    [
+     "eu-central",
+     4.77
+    ]
+   ],
+   "sha256_16": "f2091549b22f2367"
+  },
+  "h12": {
+   "columns": [
+    "trip_date",
+    "running_trips"
+   ],
+   "row_count": 7,
+   "rows": [
+    [
+     "2026-01-01",
+     1361
+    ],
+    [
+     "2026-01-02",
+     2718
+    ],
+    [
+     "2026-01-03",
+     4075
+    ],
+    [
+     "2026-01-04",
+     5429
+    ],
+    [
+     "2026-01-05",
+     6754
+    ],
+    [
+     "2026-01-06",
+     8076
+    ],
+    [
+     "2026-01-07",
+     9381
+    ]
+   ],
+   "sha256_16": "af1e4efff0a7918f"
+  },
+  "h13": {
+   "columns": [
+    "device_id"
+   ],
+   "row_count": 1,
+   "rows": [
+    [
+     "dev-000225"
+    ]
+   ],
+   "sha256_16": "2e95fddbe2e28c4b"
+  },
+  "h14": {
+   "columns": [
+    "pct"
+   ],
+   "row_count": 1,
+   "rows": [
+    [
+     52.1
+    ]
+   ],
+   "sha256_16": "4d86405ffb0f989e"
+  }
+ }
+}

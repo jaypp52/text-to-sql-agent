@@ -1,0 +1,1090 @@
+{
+ "metadata": {
+  "dbt_version": "1.11.15",
+  "generated_at": "2026-11-23T16:30:05.442728Z"
+ },
+ "nodes": {
+  "model.telemetry.dim_date": {
+   "columns": {
+    "date_day": {
+     "index": 1,
+     "name": "date_day",
+     "type": "DATE"
+    },
+    "day_name": {
+     "index": 6,
+     "name": "day_name",
+     "type": "VARCHAR"
+    },
+    "day_of_month": {
+     "index": 4,
+     "name": "day_of_month",
+     "type": "BIGINT"
+    },
+    "is_weekend": {
+     "index": 7,
+     "name": "is_weekend",
+     "type": "BOOLEAN"
+    },
+    "iso_day_of_week": {
+     "index": 5,
+     "name": "iso_day_of_week",
+     "type": "BIGINT"
+    },
+    "iso_week": {
+     "index": 8,
+     "name": "iso_week",
+     "type": "BIGINT"
+    },
+    "month": {
+     "index": 3,
+     "name": "month",
+     "type": "BIGINT"
+    },
+    "year": {
+     "index": 2,
+     "name": "year",
+     "type": "BIGINT"
+    }
+   },
+   "metadata": {
+    "name": "dim_date",
+    "schema": "marts",
+    "type": "BASE TABLE"
+   }
+  },
+  "model.telemetry.dim_device": {
+   "columns": {
+    "device_id": {
+     "index": 2,
+     "name": "device_id",
+     "type": "VARCHAR"
+    },
+    "device_key": {
+     "index": 1,
+     "name": "device_key",
+     "type": "VARCHAR"
+    },
+    "firmware_version": {
+     "index": 6,
+     "name": "firmware_version",
+     "type": "VARCHAR"
+    },
+    "hardware_model": {
+     "index": 3,
+     "name": "hardware_model",
+     "type": "VARCHAR"
+    },
+    "install_date": {
+     "index": 5,
+     "name": "install_date",
+     "type": "DATE"
+    },
+    "is_current": {
+     "index": 9,
+     "name": "is_current",
+     "type": "BOOLEAN"
+    },
+    "region_id": {
+     "index": 4,
+     "name": "region_id",
+     "type": "VARCHAR"
+    },
+    "valid_from": {
+     "index": 7,
+     "name": "valid_from",
+     "type": "TIMESTAMP"
+    },
+    "valid_to": {
+     "index": 8,
+     "name": "valid_to",
+     "type": "TIMESTAMP"
+    }
+   },
+   "metadata": {
+    "name": "dim_device",
+    "schema": "marts",
+    "type": "BASE TABLE"
+   }
+  },
+  "model.telemetry.dim_firmware": {
+   "columns": {
+    "firmware_version": {
+     "index": 1,
+     "name": "firmware_version",
+     "type": "VARCHAR"
+    },
+    "is_latest": {
+     "index": 6,
+     "name": "is_latest",
+     "type": "BOOLEAN"
+    },
+    "major": {
+     "index": 3,
+     "name": "major",
+     "type": "INTEGER"
+    },
+    "minor": {
+     "index": 4,
+     "name": "minor",
+     "type": "INTEGER"
+    },
+    "patch": {
+     "index": 5,
+     "name": "patch",
+     "type": "INTEGER"
+    },
+    "release_date": {
+     "index": 2,
+     "name": "release_date",
+     "type": "DATE"
+    }
+   },
+   "metadata": {
+    "name": "dim_firmware",
+    "schema": "marts",
+    "type": "BASE TABLE"
+   }
+  },
+  "model.telemetry.fct_device_daily": {
+   "columns": {
+    "avg_temp_c": {
+     "index": 12,
+     "name": "avg_temp_c",
+     "type": "DECIMAL(6,2)"
+    },
+    "crash_count": {
+     "index": 17,
+     "name": "crash_count",
+     "type": "HUGEINT"
+    },
+    "device_event_count": {
+     "index": 16,
+     "name": "device_event_count",
+     "type": "BIGINT"
+    },
+    "device_id": {
+     "index": 1,
+     "name": "device_id",
+     "type": "VARCHAR"
+    },
+    "device_key": {
+     "index": 3,
+     "name": "device_key",
+     "type": "VARCHAR"
+    },
+    "drive_minutes": {
+     "index": 8,
+     "name": "drive_minutes",
+     "type": "BIGINT"
+    },
+    "event_date": {
+     "index": 2,
+     "name": "event_date",
+     "type": "DATE"
+    },
+    "firmware_changed": {
+     "index": 7,
+     "name": "firmware_changed",
+     "type": "BOOLEAN"
+    },
+    "firmware_version": {
+     "index": 6,
+     "name": "firmware_version",
+     "type": "VARCHAR"
+    },
+    "gps_valid_pct": {
+     "index": 11,
+     "name": "gps_valid_pct",
+     "type": "DECIMAL(9,2)"
+    },
+    "hardware_model": {
+     "index": 4,
+     "name": "hardware_model",
+     "type": "VARCHAR"
+    },
+    "lte_loss_minutes": {
+     "index": 9,
+     "name": "lte_loss_minutes",
+     "type": "HUGEINT"
+    },
+    "lte_loss_pct": {
+     "index": 10,
+     "name": "lte_loss_pct",
+     "type": "DECIMAL(9,2)"
+    },
+    "max_temp_c": {
+     "index": 13,
+     "name": "max_temp_c",
+     "type": "DOUBLE"
+    },
+    "overheat_count": {
+     "index": 19,
+     "name": "overheat_count",
+     "type": "HUGEINT"
+    },
+    "reboot_count": {
+     "index": 18,
+     "name": "reboot_count",
+     "type": "HUGEINT"
+    },
+    "region_id": {
+     "index": 5,
+     "name": "region_id",
+     "type": "VARCHAR"
+    },
+    "trip_count": {
+     "index": 14,
+     "name": "trip_count",
+     "type": "BIGINT"
+    },
+    "trip_distance_km": {
+     "index": 15,
+     "name": "trip_distance_km",
+     "type": "DECIMAL(38,2)"
+    }
+   },
+   "metadata": {
+    "name": "fct_device_daily",
+    "schema": "marts",
+    "type": "BASE TABLE"
+   }
+  },
+  "model.telemetry.fct_device_event": {
+   "columns": {
+    "device_id": {
+     "index": 2,
+     "name": "device_id",
+     "type": "VARCHAR"
+    },
+    "device_key": {
+     "index": 3,
+     "name": "device_key",
+     "type": "VARCHAR"
+    },
+    "event_code": {
+     "index": 6,
+     "name": "event_code",
+     "type": "VARCHAR"
+    },
+    "event_date": {
+     "index": 5,
+     "name": "event_date",
+     "type": "DATE"
+    },
+    "event_id": {
+     "index": 1,
+     "name": "event_id",
+     "type": "VARCHAR"
+    },
+    "event_ts": {
+     "index": 4,
+     "name": "event_ts",
+     "type": "TIMESTAMP"
+    },
+    "firmware_version": {
+     "index": 9,
+     "name": "firmware_version",
+     "type": "VARCHAR"
+    },
+    "hardware_model": {
+     "index": 10,
+     "name": "hardware_model",
+     "type": "VARCHAR"
+    },
+    "is_late": {
+     "index": 12,
+     "name": "is_late",
+     "type": "BOOLEAN"
+    },
+    "message": {
+     "index": 8,
+     "name": "message",
+     "type": "VARCHAR"
+    },
+    "region_id": {
+     "index": 11,
+     "name": "region_id",
+     "type": "VARCHAR"
+    },
+    "severity": {
+     "index": 7,
+     "name": "severity",
+     "type": "VARCHAR"
+    }
+   },
+   "metadata": {
+    "name": "fct_device_event",
+    "schema": "marts",
+    "type": "BASE TABLE"
+   }
+  },
+  "model.telemetry.fct_device_minute": {
+   "columns": {
+    "cpu_pct": {
+     "index": 10,
+     "name": "cpu_pct",
+     "type": "DOUBLE"
+    },
+    "device_id": {
+     "index": 2,
+     "name": "device_id",
+     "type": "VARCHAR"
+    },
+    "device_key": {
+     "index": 5,
+     "name": "device_key",
+     "type": "VARCHAR"
+    },
+    "device_minute_id": {
+     "index": 1,
+     "name": "device_minute_id",
+     "type": "VARCHAR"
+    },
+    "event_date": {
+     "index": 4,
+     "name": "event_date",
+     "type": "DATE"
+    },
+    "firmware_version": {
+     "index": 8,
+     "name": "firmware_version",
+     "type": "VARCHAR"
+    },
+    "fix_valid": {
+     "index": 23,
+     "name": "fix_valid",
+     "type": "BOOLEAN"
+    },
+    "hardware_model": {
+     "index": 6,
+     "name": "hardware_model",
+     "type": "VARCHAR"
+    },
+    "has_heartbeat": {
+     "index": 9,
+     "name": "has_heartbeat",
+     "type": "BOOLEAN"
+    },
+    "ip_assigned": {
+     "index": 17,
+     "name": "ip_assigned",
+     "type": "BOOLEAN"
+    },
+    "lat": {
+     "index": 19,
+     "name": "lat",
+     "type": "DOUBLE"
+    },
+    "lon": {
+     "index": 20,
+     "name": "lon",
+     "type": "DOUBLE"
+    },
+    "lte_lost": {
+     "index": 18,
+     "name": "lte_lost",
+     "type": "BOOLEAN"
+    },
+    "mem_free_mb": {
+     "index": 11,
+     "name": "mem_free_mb",
+     "type": "INTEGER"
+    },
+    "minute_ts": {
+     "index": 3,
+     "name": "minute_ts",
+     "type": "TIMESTAMP"
+    },
+    "region_id": {
+     "index": 7,
+     "name": "region_id",
+     "type": "VARCHAR"
+    },
+    "registered": {
+     "index": 16,
+     "name": "registered",
+     "type": "BOOLEAN"
+    },
+    "rsrp_dbm": {
+     "index": 14,
+     "name": "rsrp_dbm",
+     "type": "DOUBLE"
+    },
+    "satellites": {
+     "index": 22,
+     "name": "satellites",
+     "type": "INTEGER"
+    },
+    "sinr_db": {
+     "index": 15,
+     "name": "sinr_db",
+     "type": "DOUBLE"
+    },
+    "speed_kmh": {
+     "index": 21,
+     "name": "speed_kmh",
+     "type": "DOUBLE"
+    },
+    "storage_free_pct": {
+     "index": 13,
+     "name": "storage_free_pct",
+     "type": "DOUBLE"
+    },
+    "temp_c": {
+     "index": 12,
+     "name": "temp_c",
+     "type": "DOUBLE"
+    }
+   },
+   "metadata": {
+    "name": "fct_device_minute",
+    "schema": "marts",
+    "type": "BASE TABLE"
+   }
+  },
+  "model.telemetry.fct_firmware_daily": {
+   "columns": {
+    "crash_count": {
+     "index": 7,
+     "name": "crash_count",
+     "type": "BIGINT"
+    },
+    "crash_rate_per_100_device_days": {
+     "index": 8,
+     "name": "crash_rate_per_100_device_days",
+     "type": "DOUBLE"
+    },
+    "device_count": {
+     "index": 4,
+     "name": "device_count",
+     "type": "BIGINT"
+    },
+    "device_days": {
+     "index": 5,
+     "name": "device_days",
+     "type": "BIGINT"
+    },
+    "drive_minutes": {
+     "index": 6,
+     "name": "drive_minutes",
+     "type": "HUGEINT"
+    },
+    "event_date": {
+     "index": 3,
+     "name": "event_date",
+     "type": "DATE"
+    },
+    "firmware_version": {
+     "index": 1,
+     "name": "firmware_version",
+     "type": "VARCHAR"
+    },
+    "hardware_model": {
+     "index": 2,
+     "name": "hardware_model",
+     "type": "VARCHAR"
+    },
+    "mean_lte_loss_pct": {
+     "index": 9,
+     "name": "mean_lte_loss_pct",
+     "type": "DECIMAL(9,2)"
+    }
+   },
+   "metadata": {
+    "name": "fct_firmware_daily",
+    "schema": "marts",
+    "type": "BASE TABLE"
+   }
+  },
+  "model.telemetry.fct_trip": {
+   "columns": {
+    "avg_speed_kmh": {
+     "index": 9,
+     "name": "avg_speed_kmh",
+     "type": "DOUBLE"
+    },
+    "device_id": {
+     "index": 2,
+     "name": "device_id",
+     "type": "VARCHAR"
+    },
+    "device_key": {
+     "index": 3,
+     "name": "device_key",
+     "type": "VARCHAR"
+    },
+    "distance_km": {
+     "index": 8,
+     "name": "distance_km",
+     "type": "DOUBLE"
+    },
+    "duration_min": {
+     "index": 7,
+     "name": "duration_min",
+     "type": "DOUBLE"
+    },
+    "ended_at": {
+     "index": 5,
+     "name": "ended_at",
+     "type": "TIMESTAMP"
+    },
+    "firmware_version": {
+     "index": 10,
+     "name": "firmware_version",
+     "type": "VARCHAR"
+    },
+    "hardware_model": {
+     "index": 11,
+     "name": "hardware_model",
+     "type": "VARCHAR"
+    },
+    "is_complete": {
+     "index": 13,
+     "name": "is_complete",
+     "type": "BOOLEAN"
+    },
+    "region_id": {
+     "index": 12,
+     "name": "region_id",
+     "type": "VARCHAR"
+    },
+    "started_at": {
+     "index": 4,
+     "name": "started_at",
+     "type": "TIMESTAMP"
+    },
+    "trip_date": {
+     "index": 6,
+     "name": "trip_date",
+     "type": "DATE"
+    },
+    "trip_id": {
+     "index": 1,
+     "name": "trip_id",
+     "type": "VARCHAR"
+    }
+   },
+   "metadata": {
+    "name": "fct_trip",
+    "schema": "marts",
+    "type": "BASE TABLE"
+   }
+  },
+  "model.telemetry.stg_device_event": {
+   "columns": {
+    "device_id": {
+     "index": 2,
+     "name": "device_id",
+     "type": "VARCHAR"
+    },
+    "event_code": {
+     "index": 7,
+     "name": "event_code",
+     "type": "VARCHAR"
+    },
+    "event_date": {
+     "index": 5,
+     "name": "event_date",
+     "type": "DATE"
+    },
+    "event_id": {
+     "index": 1,
+     "name": "event_id",
+     "type": "VARCHAR"
+    },
+    "event_ts": {
+     "index": 4,
+     "name": "event_ts",
+     "type": "TIMESTAMP"
+    },
+    "event_type": {
+     "index": 3,
+     "name": "event_type",
+     "type": "VARCHAR"
+    },
+    "firmware_version": {
+     "index": 6,
+     "name": "firmware_version",
+     "type": "VARCHAR"
+    },
+    "ingest_ts": {
+     "index": 11,
+     "name": "ingest_ts",
+     "type": "TIMESTAMP"
+    },
+    "is_late": {
+     "index": 10,
+     "name": "is_late",
+     "type": "BOOLEAN"
+    },
+    "message": {
+     "index": 9,
+     "name": "message",
+     "type": "VARCHAR"
+    },
+    "severity": {
+     "index": 8,
+     "name": "severity",
+     "type": "VARCHAR"
+    }
+   },
+   "metadata": {
+    "name": "stg_device_event",
+    "schema": "staging",
+    "type": "VIEW"
+   }
+  },
+  "model.telemetry.stg_firmware_releases": {
+   "columns": {
+    "firmware_version": {
+     "index": 1,
+     "name": "firmware_version",
+     "type": "VARCHAR"
+    },
+    "release_date": {
+     "index": 2,
+     "name": "release_date",
+     "type": "DATE"
+    }
+   },
+   "metadata": {
+    "name": "stg_firmware_releases",
+    "schema": "staging",
+    "type": "VIEW"
+   }
+  },
+  "model.telemetry.stg_fleet_registry": {
+   "columns": {
+    "device_id": {
+     "index": 1,
+     "name": "device_id",
+     "type": "VARCHAR"
+    },
+    "factory_firmware_version": {
+     "index": 5,
+     "name": "factory_firmware_version",
+     "type": "VARCHAR"
+    },
+    "hardware_model": {
+     "index": 2,
+     "name": "hardware_model",
+     "type": "VARCHAR"
+    },
+    "install_date": {
+     "index": 4,
+     "name": "install_date",
+     "type": "DATE"
+    },
+    "region_id": {
+     "index": 3,
+     "name": "region_id",
+     "type": "VARCHAR"
+    }
+   },
+   "metadata": {
+    "name": "stg_fleet_registry",
+    "schema": "staging",
+    "type": "VIEW"
+   }
+  },
+  "model.telemetry.stg_gps": {
+   "columns": {
+    "device_id": {
+     "index": 2,
+     "name": "device_id",
+     "type": "VARCHAR"
+    },
+    "event_date": {
+     "index": 6,
+     "name": "event_date",
+     "type": "DATE"
+    },
+    "event_id": {
+     "index": 1,
+     "name": "event_id",
+     "type": "VARCHAR"
+    },
+    "event_ts": {
+     "index": 4,
+     "name": "event_ts",
+     "type": "TIMESTAMP"
+    },
+    "event_type": {
+     "index": 3,
+     "name": "event_type",
+     "type": "VARCHAR"
+    },
+    "firmware_version": {
+     "index": 7,
+     "name": "firmware_version",
+     "type": "VARCHAR"
+    },
+    "fix_valid": {
+     "index": 12,
+     "name": "fix_valid",
+     "type": "BOOLEAN"
+    },
+    "ingest_ts": {
+     "index": 14,
+     "name": "ingest_ts",
+     "type": "TIMESTAMP"
+    },
+    "is_late": {
+     "index": 13,
+     "name": "is_late",
+     "type": "BOOLEAN"
+    },
+    "lat": {
+     "index": 8,
+     "name": "lat",
+     "type": "DOUBLE"
+    },
+    "lon": {
+     "index": 9,
+     "name": "lon",
+     "type": "DOUBLE"
+    },
+    "minute_ts": {
+     "index": 5,
+     "name": "minute_ts",
+     "type": "TIMESTAMP"
+    },
+    "satellites": {
+     "index": 11,
+     "name": "satellites",
+     "type": "INTEGER"
+    },
+    "speed_kmh": {
+     "index": 10,
+     "name": "speed_kmh",
+     "type": "DOUBLE"
+    }
+   },
+   "metadata": {
+    "name": "stg_gps",
+    "schema": "staging",
+    "type": "VIEW"
+   }
+  },
+  "model.telemetry.stg_heartbeat": {
+   "columns": {
+    "cpu_pct": {
+     "index": 8,
+     "name": "cpu_pct",
+     "type": "DOUBLE"
+    },
+    "device_id": {
+     "index": 2,
+     "name": "device_id",
+     "type": "VARCHAR"
+    },
+    "event_date": {
+     "index": 6,
+     "name": "event_date",
+     "type": "DATE"
+    },
+    "event_id": {
+     "index": 1,
+     "name": "event_id",
+     "type": "VARCHAR"
+    },
+    "event_ts": {
+     "index": 4,
+     "name": "event_ts",
+     "type": "TIMESTAMP"
+    },
+    "event_type": {
+     "index": 3,
+     "name": "event_type",
+     "type": "VARCHAR"
+    },
+    "firmware_version": {
+     "index": 7,
+     "name": "firmware_version",
+     "type": "VARCHAR"
+    },
+    "ingest_ts": {
+     "index": 13,
+     "name": "ingest_ts",
+     "type": "TIMESTAMP"
+    },
+    "is_late": {
+     "index": 12,
+     "name": "is_late",
+     "type": "BOOLEAN"
+    },
+    "mem_free_mb": {
+     "index": 9,
+     "name": "mem_free_mb",
+     "type": "INTEGER"
+    },
+    "minute_ts": {
+     "index": 5,
+     "name": "minute_ts",
+     "type": "TIMESTAMP"
+    },
+    "storage_free_pct": {
+     "index": 11,
+     "name": "storage_free_pct",
+     "type": "DOUBLE"
+    },
+    "temp_c": {
+     "index": 10,
+     "name": "temp_c",
+     "type": "DOUBLE"
+    }
+   },
+   "metadata": {
+    "name": "stg_heartbeat",
+    "schema": "staging",
+    "type": "VIEW"
+   }
+  },
+  "model.telemetry.stg_lte": {
+   "columns": {
+    "device_id": {
+     "index": 2,
+     "name": "device_id",
+     "type": "VARCHAR"
+    },
+    "event_date": {
+     "index": 6,
+     "name": "event_date",
+     "type": "DATE"
+    },
+    "event_id": {
+     "index": 1,
+     "name": "event_id",
+     "type": "VARCHAR"
+    },
+    "event_ts": {
+     "index": 4,
+     "name": "event_ts",
+     "type": "TIMESTAMP"
+    },
+    "event_type": {
+     "index": 3,
+     "name": "event_type",
+     "type": "VARCHAR"
+    },
+    "firmware_version": {
+     "index": 7,
+     "name": "firmware_version",
+     "type": "VARCHAR"
+    },
+    "ingest_ts": {
+     "index": 13,
+     "name": "ingest_ts",
+     "type": "TIMESTAMP"
+    },
+    "ip_assigned": {
+     "index": 11,
+     "name": "ip_assigned",
+     "type": "BOOLEAN"
+    },
+    "is_late": {
+     "index": 12,
+     "name": "is_late",
+     "type": "BOOLEAN"
+    },
+    "minute_ts": {
+     "index": 5,
+     "name": "minute_ts",
+     "type": "TIMESTAMP"
+    },
+    "registered": {
+     "index": 10,
+     "name": "registered",
+     "type": "BOOLEAN"
+    },
+    "rsrp_dbm": {
+     "index": 8,
+     "name": "rsrp_dbm",
+     "type": "DOUBLE"
+    },
+    "sinr_db": {
+     "index": 9,
+     "name": "sinr_db",
+     "type": "DOUBLE"
+    }
+   },
+   "metadata": {
+    "name": "stg_lte",
+    "schema": "staging",
+    "type": "VIEW"
+   }
+  },
+  "model.telemetry.stg_trip": {
+   "columns": {
+    "device_id": {
+     "index": 2,
+     "name": "device_id",
+     "type": "VARCHAR"
+    },
+    "end_odometer_km": {
+     "index": 6,
+     "name": "end_odometer_km",
+     "type": "DOUBLE"
+    },
+    "ended_at": {
+     "index": 4,
+     "name": "ended_at",
+     "type": "TIMESTAMP"
+    },
+    "firmware_version": {
+     "index": 7,
+     "name": "firmware_version",
+     "type": "VARCHAR"
+    },
+    "is_complete": {
+     "index": 8,
+     "name": "is_complete",
+     "type": "BOOLEAN"
+    },
+    "start_odometer_km": {
+     "index": 5,
+     "name": "start_odometer_km",
+     "type": "DOUBLE"
+    },
+    "started_at": {
+     "index": 3,
+     "name": "started_at",
+     "type": "TIMESTAMP"
+    },
+    "trip_id": {
+     "index": 1,
+     "name": "trip_id",
+     "type": "VARCHAR"
+    }
+   },
+   "metadata": {
+    "name": "stg_trip",
+    "schema": "staging",
+    "type": "VIEW"
+   }
+  },
+  "seed.telemetry.dim_event_code": {
+   "columns": {
+    "category": {
+     "index": 2,
+     "name": "category",
+     "type": "VARCHAR"
+    },
+    "description": {
+     "index": 4,
+     "name": "description",
+     "type": "VARCHAR"
+    },
+    "event_code": {
+     "index": 1,
+     "name": "event_code",
+     "type": "VARCHAR"
+    },
+    "severity": {
+     "index": 3,
+     "name": "severity",
+     "type": "VARCHAR"
+    }
+   },
+   "metadata": {
+    "name": "dim_event_code",
+    "schema": "marts",
+    "type": "BASE TABLE"
+   }
+  },
+  "seed.telemetry.dim_region": {
+   "columns": {
+    "center_lat": {
+     "index": 4,
+     "name": "center_lat",
+     "type": "DOUBLE"
+    },
+    "center_lon": {
+     "index": 5,
+     "name": "center_lon",
+     "type": "DOUBLE"
+    },
+    "region_id": {
+     "index": 1,
+     "name": "region_id",
+     "type": "VARCHAR"
+    },
+    "region_name": {
+     "index": 2,
+     "name": "region_name",
+     "type": "VARCHAR"
+    },
+    "timezone": {
+     "index": 3,
+     "name": "timezone",
+     "type": "VARCHAR"
+    }
+   },
+   "metadata": {
+    "name": "dim_region",
+    "schema": "marts",
+    "type": "BASE TABLE"
+   }
+  },
+  "snapshot.telemetry.dim_device_snapshot": {
+   "columns": {
+    "dbt_scd_id": {
+     "index": 7,
+     "name": "dbt_scd_id",
+     "type": "VARCHAR"
+    },
+    "dbt_updated_at": {
+     "index": 8,
+     "name": "dbt_updated_at",
+     "type": "TIMESTAMP"
+    },
+    "dbt_valid_from": {
+     "index": 9,
+     "name": "dbt_valid_from",
+     "type": "TIMESTAMP"
+    },
+    "dbt_valid_to": {
+     "index": 10,
+     "name": "dbt_valid_to",
+     "type": "TIMESTAMP"
+    },
+    "device_id": {
+     "index": 1,
+     "name": "device_id",
+     "type": "VARCHAR"
+    },
+    "firmware_since": {
+     "index": 6,
+     "name": "firmware_since",
+     "type": "TIMESTAMP"
+    },
+    "firmware_version": {
+     "index": 5,
+     "name": "firmware_version",
+     "type": "VARCHAR"
+    },
+    "hardware_model": {
+     "index": 2,
+     "name": "hardware_model",
+     "type": "VARCHAR"
+    },
+    "install_date": {
+     "index": 4,
+     "name": "install_date",
+     "type": "DATE"
+    },
+    "region_id": {
+     "index": 3,
+     "name": "region_id",
+     "type": "VARCHAR"
+    }
+   },
+   "metadata": {
+    "name": "dim_device_snapshot",
+    "schema": "snapshots",
+    "type": "BASE TABLE"
+   }
+  }
+ }
+}
