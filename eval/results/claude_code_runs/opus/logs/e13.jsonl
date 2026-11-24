@@ -1,0 +1,2 @@
+{"t": 1795519301.5082717, "kind": "run_sql", "sql": "SELECT count(DISTINCT device_id) AS devices FROM marts.fct_device_event WHERE event_code = 'OVERHEAT'", "ok": true, "result_kind": "ok"}
+{"t": 1795519329.0259068, "kind": "submit", "sql": "SELECT count(DISTINCT device_id) AS devices FROM marts.fct_device_event WHERE event_code = 'OVERHEAT'", "ok": true, "result_kind": "ok"}

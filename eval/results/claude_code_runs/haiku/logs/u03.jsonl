@@ -1,0 +1,1 @@
+{"t": 1795519328.3265114, "kind": "run_sql", "sql": "SELECT event_code, category, severity, description FROM marts.dim_event_code ORDER BY 1", "ok": true, "result_kind": "ok"}

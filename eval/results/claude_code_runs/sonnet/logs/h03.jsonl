@@ -1,0 +1,2 @@
+{"t": 1795519297.944629, "kind": "run_sql", "sql": "select firmware_version from marts.dim_device where device_id='dev-000004' and valid_from <= timestamp '2026-01-05 12:00:00' and timestamp '2026-01-05 12:00:00' < valid_to", "ok": true, "result_kind": "ok"}
+{"t": 1795519309.826285, "kind": "submit", "sql": "select firmware_version from marts.dim_device where device_id='dev-000004' and valid_from <= timestamp '2026-01-05 12:00:00' and timestamp '2026-01-05 12:00:00' < valid_to", "ok": true, "result_kind": "ok"}

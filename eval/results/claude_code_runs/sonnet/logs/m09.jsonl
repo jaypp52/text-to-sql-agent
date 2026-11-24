@@ -1,0 +1,2 @@
+{"t": 1795519299.7432108, "kind": "run_sql", "sql": "select event_date, count(distinct device_id) devices from marts.fct_device_event where event_code='FW_UPDATE' and firmware_version='1.1.0' group by 1 order by 2 desc limit 3", "ok": true, "result_kind": "ok"}
+{"t": 1795519329.4900737, "kind": "submit", "sql": "select event_date, count(distinct device_id) devices from marts.fct_device_event where event_code='FW_UPDATE' and firmware_version='1.1.0' group by 1 order by 2 desc limit 1", "ok": true, "result_kind": "ok"}

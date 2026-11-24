@@ -1,0 +1,2 @@
+{"t": 1795519281.3397155, "kind": "run_sql", "sql": "select c.category, count(*) event_count from marts.fct_device_event e join marts.dim_event_code c using(event_code) where e.event_date between '2026-01-01' and '2026-01-07' group by 1 order by 2 desc", "ok": true, "result_kind": "ok"}
+{"t": 1795519290.3760765, "kind": "submit", "sql": "select c.category, count(*) event_count from marts.fct_device_event e join marts.dim_event_code c using(event_code) where e.event_date between '2026-01-01' and '2026-01-07' group by 1 order by 2 desc", "ok": true, "result_kind": "ok"}

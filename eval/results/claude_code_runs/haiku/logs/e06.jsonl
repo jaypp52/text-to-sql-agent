@@ -1,0 +1,2 @@
+{"t": 1795519305.1298776, "kind": "run_sql", "sql": "SELECT count(*) AS complete_trips FROM marts.fct_trip WHERE is_complete AND trip_date = DATE '2026-01-03'", "ok": true, "result_kind": "ok"}
+{"t": 1795519323.3674772, "kind": "submit", "sql": "SELECT count(*) AS complete_trips FROM marts.fct_trip WHERE is_complete AND trip_date = DATE '2026-01-03'", "ok": true, "result_kind": "ok"}

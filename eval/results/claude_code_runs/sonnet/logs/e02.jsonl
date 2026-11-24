@@ -1,0 +1,2 @@
+{"t": 1795519279.3684988, "kind": "run_sql", "sql": "select count(distinct device_id) from marts.dim_device where region_id='us-west' and is_current", "ok": true, "result_kind": "ok"}
+{"t": 1795519317.6938725, "kind": "submit", "sql": "select count(distinct device_id) from marts.dim_device where region_id='us-west' and is_current", "ok": true, "result_kind": "ok"}

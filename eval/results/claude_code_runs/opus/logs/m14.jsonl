@@ -1,0 +1,4 @@
+{"t": 1795519303.135147, "kind": "run_sql", "sql": "SELECT firmware_version, count(*) AS reboot_events FROM marts.fct_device_event WHERE event_code = 'REBOOT' GROUP BY 1 ORDER BY 1", "ok": true, "result_kind": "ok"}
+{"t": 1795519303.6947963, "kind": "run_sql", "sql": "SELECT * FROM marts.dim_event_code", "ok": true, "result_kind": "ok"}
+{"t": 1795519310.0479987, "kind": "run_sql", "sql": "SELECT event_code, firmware_version, count(*) FROM marts.fct_device_event GROUP BY ALL ORDER BY 1,2", "ok": true, "result_kind": "ok"}
+{"t": 1795519318.2300296, "kind": "submit", "sql": "SELECT firmware_version, count(*) AS reboot_events FROM marts.fct_device_event WHERE event_code = 'REBOOT' GROUP BY firmware_version ORDER BY firmware_version", "ok": true, "result_kind": "ok"}

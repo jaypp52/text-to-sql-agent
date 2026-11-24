@@ -1,0 +1,2 @@
+{"t": 1795519351.8103154, "kind": "run_sql", "sql": "SELECT region_id, ROUND(sum(drive_minutes) / 60.0, 2) AS drive_hours FROM marts.fct_device_daily WHERE event_date = DATE '2026-01-06' GROUP BY region_id ORDER BY region_id", "ok": true, "result_kind": "ok"}
+{"t": 1795519369.2592156, "kind": "submit", "sql": "SELECT region_id, ROUND(sum(drive_minutes) / 60.0, 2) AS drive_hours FROM marts.fct_device_daily WHERE event_date = DATE '2026-01-06' GROUP BY region_id ORDER BY region_id", "ok": true, "result_kind": "ok"}

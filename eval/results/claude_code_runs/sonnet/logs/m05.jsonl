@@ -1,0 +1,2 @@
+{"t": 1795519297.6628485, "kind": "run_sql", "sql": "select d.is_weekend, count(*) trips from marts.fct_trip t join marts.dim_date d on d.date_day=t.trip_date where t.trip_date between DATE '2026-01-01' and DATE '2026-01-07' group by 1 order by 1", "ok": true, "result_kind": "ok"}
+{"t": 1795519327.29349, "kind": "submit", "sql": "select d.is_weekend, count(*) trips from marts.fct_trip t join marts.dim_date d on d.date_day=t.trip_date where t.trip_date between DATE '2026-01-01' and DATE '2026-01-07' group by 1 order by 1", "ok": true, "result_kind": "ok"}

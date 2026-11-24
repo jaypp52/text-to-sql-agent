@@ -1,0 +1,2 @@
+{"t": 1795519302.5935209, "kind": "run_sql", "sql": "SELECT hardware_model, round(avg(gps_valid_pct), 2) AS avg_gps_valid_pct FROM marts.fct_device_daily WHERE event_date BETWEEN DATE '2026-01-01' AND DATE '2026-01-07' GROUP BY 1 ORDER BY 1", "ok": true, "result_kind": "ok"}
+{"t": 1795519317.628596, "kind": "submit", "sql": "SELECT hardware_model, round(avg(gps_valid_pct), 2) AS avg_gps_valid_pct FROM marts.fct_device_daily WHERE event_date BETWEEN DATE '2026-01-01' AND DATE '2026-01-07' GROUP BY hardware_model ORDER BY hardware_model", "ok": true, "result_kind": "ok"}

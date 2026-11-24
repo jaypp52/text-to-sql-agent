@@ -249,6 +249,49 @@ _Not run yet: `make eval` needs `ANTHROPIC_API_KEY`. This block is overwritten f
 `eval/results/latest.json` by `make eval`; no number here is typed by hand._
 <!-- results:end -->
 
+### Claude Code baseline (Haiku, Sonnet, Opus)
+
+The API agent has not run yet (no API key), so the labelled set was also answered by
+**Claude through Claude Code sessions** that had only this agent's own tools, as a command
+line, in a copy of the repo without `eval/`, so no gold SQL was visible: schema search,
+describe table, guarded `run_sql`, and submit. They also had the agent's system prompt.
+`eval/compare.py` scored every answer exactly as `make eval` would. The tool script itself
+logged every SQL call, so the SQL-attempt figures are measured, not self-reported. This is a
+baseline for the model with these tools, **not** a run of `agent/loop.py`: there are no
+token, cost or latency figures. Raw answers and logs are in `eval/results/claude_code_runs/`;
+re-score with `python -m eval.claude_code_baseline --run haiku=eval/results/claude_code_runs/haiku ...`.
+
+<!-- baseline:start -->
+Generated 2026-11-24T11:26:52+00:00 by `python -m eval.claude_code_baseline` · 50 labelled questions · platform warehouse · **Claude via Claude Code sessions using this agent's tools, not the API agent loop** (no token, cost or latency figures).
+
+| Metric | Claude Code · haiku | Claude Code · sonnet | Claude Code · opus |
+|---|---|---|---|
+| Execution accuracy, all 50 | 86.0% | 94.0% | 90.0% |
+| … answerable (44) | 84.1% | 93.2% | 88.6% |
+| … easy | 100.0% | 100.0% | 100.0% |
+| … medium | 73.3% | 93.3% | 80.0% |
+| … hard | 78.6% | 85.7% | 85.7% |
+| Abstention accuracy (6 unanswerable) | 100.0% | 100.0% | 100.0% |
+| Valid SQL, first attempt | 100.0% | 100.0% | 100.0% |
+| Questions that hit ≥ 1 SQL error | 0.0% | 0.0% | 0.0% |
+| … of those recovered | n/a | n/a | n/a |
+| Mean SQL attempts per question | 1.98 | 1.98 | 2.32 |
+| Guard rejections | 0 | 0 | 0 |
+
+Every wrong answer, with a hand-written diagnosis (`eval/claude_code_baseline_notes.json`):
+
+| Question | Wrong for | Cause |
+|---|---|---|
+| h01 | haiku, sonnet, opus | returned every model, not the top 1 (haiku, sonnet); a different, day-weighted metric from fct_firmware_daily (opus) |
+| h09 | haiku | included 2026-01-01 with a NULL change (haiku) |
+| h10 | haiku, sonnet, opus | ambiguous question: three different readings of 'devices that upgraded' and 'days fully on'; flagged for gold review |
+| m05 | opus | opus excluded trips whose start was never loaded (started_at IS NULL); arguably more correct than the gold; flagged for gold review |
+| m08 | haiku, opus | rounded to 2 decimals although the question did not ask; strict 1e-6 comparison counts it wrong |
+| m09 | haiku | listed every day instead of the single top day (haiku) |
+| m10 | haiku, opus | rounded to 2 decimals although the question did not ask; strict 1e-6 comparison counts it wrong |
+| m11 | haiku, sonnet | returned every model ranked instead of the top 1 |
+<!-- baseline:end -->
+
 The pipeline itself is checked without a model. `make eval-mock` replays the gold SQL
 through the real loop, guard and scorer; one question in four first sends a broken query
 to exercise self-correction. It must score 100% with 0 guard rejections, and CI fails

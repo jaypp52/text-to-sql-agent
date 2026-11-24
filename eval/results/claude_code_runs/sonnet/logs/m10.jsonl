@@ -1,0 +1,2 @@
+{"t": 1795519300.2567196, "kind": "run_sql", "sql": "select region_id, sum(drive_minutes)/60.0 drive_hours from marts.fct_device_daily where event_date=DATE '2026-01-06' group by 1 order by 1", "ok": true, "result_kind": "ok"}
+{"t": 1795519329.967625, "kind": "submit", "sql": "select region_id, sum(drive_minutes)/60.0 drive_hours from marts.fct_device_daily where event_date=DATE '2026-01-06' group by 1 order by 1", "ok": true, "result_kind": "ok"}

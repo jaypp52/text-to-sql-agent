@@ -1,0 +1,1 @@
+{"t": 1795519350.9738996, "kind": "run_sql", "sql": "select event_code, description from marts.dim_event_code", "ok": true, "result_kind": "ok"}

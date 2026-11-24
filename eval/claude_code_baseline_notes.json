@@ -1,0 +1,10 @@
+{
+ "h01": {"cause": "returned every model, not the top 1 (haiku, sonnet); a different, day-weighted metric from fct_firmware_daily (opus)"},
+ "h09": {"cause": "included 2026-01-01 with a NULL change (haiku)"},
+ "h10": {"cause": "ambiguous question: three different readings of 'devices that upgraded' and 'days fully on'; flagged for gold review"},
+ "m05": {"cause": "opus excluded trips whose start was never loaded (started_at IS NULL); arguably more correct than the gold; flagged for gold review"},
+ "m08": {"cause": "rounded to 2 decimals although the question did not ask; strict 1e-6 comparison counts it wrong"},
+ "m09": {"cause": "listed every day instead of the single top day (haiku)"},
+ "m10": {"cause": "rounded to 2 decimals although the question did not ask; strict 1e-6 comparison counts it wrong"},
+ "m11": {"cause": "returned every model ranked instead of the top 1"}
+}

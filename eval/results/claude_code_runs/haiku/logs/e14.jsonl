@@ -1,0 +1,2 @@
+{"t": 1795519309.4846444, "kind": "run_sql", "sql": "SELECT count(*) AS incomplete_trips FROM marts.fct_trip WHERE NOT is_complete", "ok": true, "result_kind": "ok"}
+{"t": 1795519327.9185896, "kind": "submit", "sql": "SELECT count(*) AS incomplete_trips FROM marts.fct_trip WHERE NOT is_complete", "ok": true, "result_kind": "ok"}

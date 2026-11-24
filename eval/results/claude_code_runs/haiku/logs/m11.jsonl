@@ -1,0 +1,2 @@
+{"t": 1795519311.7567005, "kind": "run_sql", "sql": "SELECT hardware_model, avg(temp_c) AS avg_board_temp_c FROM marts.fct_device_minute GROUP BY 1 ORDER BY 2 DESC", "ok": true, "result_kind": "ok"}
+{"t": 1795519354.991955, "kind": "submit", "sql": "SELECT hardware_model, avg(temp_c) AS avg_board_temp_c FROM marts.fct_device_minute GROUP BY 1 ORDER BY 2 DESC", "ok": true, "result_kind": "ok"}

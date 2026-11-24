@@ -1,0 +1,2 @@
+{"t": 1795519318.3426952, "kind": "run_sql", "sql": "SELECT hardware_model, quantile_cont(temp_c, 0.95) AS p95_board_temp_c FROM marts.fct_device_minute GROUP BY 1 ORDER BY 1", "ok": true, "result_kind": "ok"}
+{"t": 1795519378.6883435, "kind": "submit", "sql": "SELECT hardware_model, quantile_cont(temp_c, 0.95) AS p95_board_temp_c FROM marts.fct_device_minute GROUP BY 1 ORDER BY 1", "ok": true, "result_kind": "ok"}

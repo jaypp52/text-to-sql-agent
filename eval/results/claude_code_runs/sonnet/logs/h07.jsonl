@@ -1,0 +1,2 @@
+{"t": 1795519316.1201615, "kind": "run_sql", "sql": "select hardware_model, median(distance_km) median_distance_km from marts.fct_trip where is_complete group by 1 order by 1", "ok": true, "result_kind": "ok"}
+{"t": 1795519326.5652695, "kind": "submit", "sql": "select hardware_model, median(distance_km) median_distance_km from marts.fct_trip where is_complete group by 1 order by 1", "ok": true, "result_kind": "ok"}

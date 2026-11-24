@@ -1,0 +1,2 @@
+{"t": 1795519350.3720949, "kind": "run_sql", "sql": "SELECT hardware_model, ROUND(avg(duration_min), 2) AS avg_duration_min FROM marts.fct_trip WHERE is_complete GROUP BY hardware_model ORDER BY hardware_model", "ok": true, "result_kind": "ok"}
+{"t": 1795519367.9723606, "kind": "submit", "sql": "SELECT hardware_model, ROUND(avg(duration_min), 2) AS avg_duration_min FROM marts.fct_trip WHERE is_complete GROUP BY hardware_model ORDER BY hardware_model", "ok": true, "result_kind": "ok"}

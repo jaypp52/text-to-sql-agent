@@ -1,0 +1,2 @@
+{"t": 1795519280.5227253, "kind": "run_sql", "sql": "select firmware_version, release_date from marts.dim_firmware where is_latest", "ok": true, "result_kind": "ok"}
+{"t": 1795519318.7529953, "kind": "submit", "sql": "select firmware_version, release_date from marts.dim_firmware where is_latest", "ok": true, "result_kind": "ok"}

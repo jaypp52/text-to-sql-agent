@@ -1,0 +1,2 @@
+{"t": 1795519291.2067456, "kind": "run_sql", "sql": "SELECT event_code FROM marts.dim_event_code WHERE severity = 'critical' ORDER BY event_code", "ok": true, "result_kind": "ok"}
+{"t": 1795519317.883231, "kind": "submit", "sql": "SELECT event_code FROM marts.dim_event_code WHERE severity = 'critical' ORDER BY event_code", "ok": true, "result_kind": "ok"}

@@ -1,0 +1,2 @@
+{"t": 1795519279.7340112, "kind": "run_sql", "sql": "select count(*) from marts.fct_device_daily where lte_loss_pct > 20", "ok": true, "result_kind": "ok"}
+{"t": 1795519288.7745879, "kind": "submit", "sql": "select count(*) from marts.fct_device_daily where lte_loss_pct > 20", "ok": true, "result_kind": "ok"}

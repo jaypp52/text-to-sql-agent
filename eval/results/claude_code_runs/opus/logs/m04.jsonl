@@ -1,0 +1,2 @@
+{"t": 1795519339.143053, "kind": "run_sql", "sql": "SELECT device_id, sum(distance_km) AS total_km FROM marts.fct_trip WHERE is_complete AND trip_date BETWEEN DATE '2026-01-01' AND DATE '2026-01-07' GROUP BY device_id ORDER BY total_km DESC LIMIT 6", "ok": true, "result_kind": "ok"}
+{"t": 1795519353.3776429, "kind": "submit", "sql": "SELECT device_id, round(sum(distance_km), 1) AS total_km FROM marts.fct_trip WHERE is_complete AND trip_date BETWEEN DATE '2026-01-01' AND DATE '2026-01-07' GROUP BY device_id ORDER BY total_km DESC LIMIT 5", "ok": true, "result_kind": "ok"}

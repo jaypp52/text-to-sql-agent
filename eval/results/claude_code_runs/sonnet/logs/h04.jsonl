@@ -1,0 +1,2 @@
+{"t": 1795519298.4894962, "kind": "run_sql", "sql": "select count(distinct device_id) from marts.dim_device where firmware_version='1.1.0' and valid_from <= timestamp '2026-01-04 00:00:00' and timestamp '2026-01-04 00:00:00' < valid_to", "ok": true, "result_kind": "ok"}
+{"t": 1795519310.353464, "kind": "submit", "sql": "select count(distinct device_id) from marts.dim_device where firmware_version='1.1.0' and valid_from <= timestamp '2026-01-04 00:00:00' and timestamp '2026-01-04 00:00:00' < valid_to", "ok": true, "result_kind": "ok"}

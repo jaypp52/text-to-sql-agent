@@ -1,0 +1,2 @@
+{"t": 1795519288.0163915, "kind": "run_sql", "sql": "SELECT count(DISTINCT device_id) AS device_count FROM marts.dim_device WHERE is_current AND region_id = 'us-west'", "ok": true, "result_kind": "ok"}
+{"t": 1795519314.655111, "kind": "submit", "sql": "SELECT count(DISTINCT device_id) AS device_count FROM marts.dim_device WHERE is_current AND region_id = 'us-west'", "ok": true, "result_kind": "ok"}

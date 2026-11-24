@@ -1,0 +1,2 @@
+{"t": 1795519294.9864028, "kind": "run_sql", "sql": "select count(distinct device_id) from marts.dim_device where is_current and firmware_version='1.1.0'", "ok": true, "result_kind": "ok"}
+{"t": 1795519324.4235306, "kind": "submit", "sql": "select count(distinct device_id) from marts.dim_device where is_current and firmware_version='1.1.0'", "ok": true, "result_kind": "ok"}

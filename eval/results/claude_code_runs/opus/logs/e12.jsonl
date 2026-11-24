@@ -1,0 +1,2 @@
+{"t": 1795519300.9555368, "kind": "run_sql", "sql": "SELECT region_id, region_name, timezone FROM marts.dim_region ORDER BY 1", "ok": true, "result_kind": "ok"}
+{"t": 1795519328.5222373, "kind": "submit", "sql": "SELECT timezone FROM marts.dim_region WHERE region_name = 'India West'", "ok": true, "result_kind": "ok"}
